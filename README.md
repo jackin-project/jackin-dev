@@ -14,16 +14,9 @@ Development workflow plugin for the [jackin](https://github.com/donbeave/jackin)
 
 ### Claude Code
 
-```sh
-claude plugin add /path/to/jackin-dev
 ```
-
-Or add to your project's `.claude/settings.json`:
-
-```json
-{
-  "plugins": ["/path/to/jackin-dev"]
-}
+/plugin marketplace add donbeave/jackin-marketplace
+/plugin install jackin-dev@jackin-marketplace
 ```
 
 ### Codex
