@@ -1,0 +1,12 @@
+{
+  "name": "jackin-dev",
+  "description": "Development workflow skills for the jackin project: release management, validation, and changelog generation",
+  "version": "0.1.0",
+  "author": {
+    "name": "Alexey Zhokhov"
+  },
+  "homepage": "https://github.com/donbeave/jackin-dev",
+  "repository": "https://github.com/donbeave/jackin-dev",
+  "license": "Apache-2.0",
+  "keywords": ["release", "changelog", "validation", "cargo-release", "rust"]
+}
