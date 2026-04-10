@@ -131,7 +131,7 @@ Remind the user:
 > - Create the GitHub Release with artifacts
 > - Update the Homebrew tap
 >
-> Monitor at: https://github.com/donbeave/jackin/actions/workflows/release.yml"
+> Monitor at: https://github.com/jackin-project/jackin/actions/workflows/release.yml"
 
 ## Error Recovery
 

@@ -1,6 +1,6 @@
 # jackin-dev
 
-Development workflow plugin for the [jackin](https://github.com/donbeave/jackin) project. Provides skills for release management, validation, and changelog generation.
+Development workflow plugin for the [jackin](https://github.com/jackin-project/jackin) project. Provides skills for release management, validation, and changelog generation.
 
 ## Skills
 
@@ -15,7 +15,7 @@ Development workflow plugin for the [jackin](https://github.com/donbeave/jackin)
 ### Claude Code
 
 ```
-/plugin marketplace add donbeave/jackin-marketplace
+/plugin marketplace add jackin-project/jackin-marketplace
 /plugin install jackin-dev@jackin-marketplace
 ```
 
@@ -29,7 +29,7 @@ Amp reads `AGENTS.md` and discovers skills from `.claude/skills/` compatibility 
 
 ## Requirements
 
-These skills are designed for the `donbeave/jackin` repository and expect:
+These skills are designed for the `jackin-project/jackin` repository and expect:
 
 - `cargo-release` installed (`cargo install cargo-release`)
 - `gh` CLI authenticated (`gh auth login`)
