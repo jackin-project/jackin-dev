@@ -84,13 +84,13 @@ Format as Keep a Changelog with PR links:
 ## [Unreleased]
 
 ### Added
-- Add TUI launcher for interactive agent selection ([#12](https://github.com/donbeave/jackin/pull/12))
+- Add TUI launcher for interactive agent selection ([#12](https://github.com/jackin-project/jackin/pull/12))
 
 ### Fixed
-- Fix symlink escape in container mounts ([#15](https://github.com/donbeave/jackin/pull/15))
+- Fix symlink escape in container mounts ([#15](https://github.com/jackin-project/jackin/pull/15))
 
 ### Changed
-- Extract testing instructions into TESTING.md ([#18](https://github.com/donbeave/jackin/pull/18))
+- Extract testing instructions into TESTING.md ([#18](https://github.com/jackin-project/jackin/pull/18))
 ```
 
 Only include sections that have entries. Do not include empty sections.
