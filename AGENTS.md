@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This is a Claude Code plugin providing development workflow skills for the [jackin](https://github.com/donbeave/jackin) project.
+This is a Claude Code plugin providing development workflow skills for the [jackin](https://github.com/jackin-project/jackin) project.
 
 ## Available Skills
 
