@@ -63,7 +63,6 @@ Priority = daily friction removed × how error-prone the manual path is.
 | S1 | `opening-jackin-prs` | "open a PR", "raise a PR for this" | body shape, verify-block selection, isolation env, capsule/docs-only branches, `--body-file` heredoc, repeat-verify reply | mixed | optional body-file builder | 🔥 highest |
 | S2 | `merging-jackin-prs` | "merge it", "ship this PR" | auth gate, CI-green, title/desc reconcile, roadmap re-check, squash `(#N)`, `jackin-pr-trailers` | low | uses `jackin-pr-trailers` | 🔥 highest |
 | S3 | `bumping-jackin-schema` | touch `AppConfig`/`WorkspaceConfig`/`RoleManifest`/`HooksConfig` | 5-artifact gate, one-bump-per-PR, fixture scaffold + re-bake, timeline entry | low | **yes** — `cargo xtask schema-check` | 🔥 high |
-| S4 | `reviewing-jackin-prs` | "review this PR/diff" | 4 cross-cutting gates + multi-agent fan-out (solo-maintainer model) | high | reuses `schema-check` | high |
 | S5 | `smoke-testing-jackin` | "verify this PR locally", "walk me through testing" | `--debug` mandate, run-id triage, console-first + `the-architect`, capsule export, isolation dirs | low-med | no | med |
 | S6 | `syncing-jackin-docs` | "update docs", pre-merge docs gate | code↔docs cross-ref, three-audience split, roadmap status/retire, `bun` gate | med | optional cross-ref/audit script | med |
 | S7 | `recording-capsule-fixtures` | "record a PTY fixture", "capture render-conformance" | `--debug` run → `cargo xtask pty-fixture` → `include_bytes!` wiring | low | no (xtask is the script) | med-low |
@@ -111,18 +110,6 @@ Each skill is a directory under `skills/<name>/`. `SKILL.md` body stays ≤500 l
 - **Freedom:** low — the five artifacts are a fixed sequence.
 - **SKILL.md flow:** identify file-kind → confirm single next-version bump (no gap/skip; rebase if `main` advanced) → add migration step in the right registry → scaffold `tests/fixtures/migrations/<kind>/from-<pred>/{meta,before,after}.toml` → re-bake all existing `after.toml` → add `schema-versions.mdx` timeline entry → run the validator → run fixture tests.
 - **Script (D2):** new `cargo xtask schema-check` (working name) — given the working tree / diff, asserts all five artifacts are present and consistent (version bumped, migration registered, fixture dir exists, every `from_version` re-baked, timeline entry added). Verbose, specific "missing X" errors. Wire the same subcommand into CI so PR-time and main-time enforce identically (PR/main parity rule). **This xtask is a prerequisite deliverable for S3.**
-
-### S4 — `reviewing-jackin-prs`  🟡  *(thin orchestrator, D3)*
-
-- **Description:** "Reviews a jackin' PR against the four cross-cutting gates — versioned-schema migration completeness, the accepted-exceptions catalog, the design principles, and the TUI design decisions — then runs the multi-agent review that substitutes for a second human reviewer. Use when asked to review a jackin' PR or diff."
-- **Freedom:** high (judgment), but the 4 gates are mandatory checks.
-- **SKILL.md flow:**
-  1. **Gate 1 — schema migration:** if diff touches the 3 versioned files, run `cargo xtask schema-check` (shared with S3); flag missing artifacts.
-  2. **Gate 2 — accepted-exceptions:** consult the open-review-findings catalog on demand; don't flag catalogued items.
-  3. **Gate 3 — design principles:** read the design-principles page; flag any contradiction with the prescribed "Operator decision required" phrasing.
-  4. **Gate 4 — TUI:** for console/capsule/TUI diffs, check the documented interaction cues (progress state, clickable affordances, footer hints, focus/scroll). Flag with the prescribed phrasing.
-  5. **Delegate:** fan out `pr-review-toolkit` agents / `/code-review` for correctness, silent-failure, type-design; collect.
-- **Earns its keep:** bundles the 4 repo-specific gates the generic reviewers don't know about, then reuses existing review machinery instead of duplicating it.
 
 ### S5–S8 — parked (specs on request)
 Smoke-testing, docs/roadmap sync, capsule fixtures, CI authoring. To be specced after S1–S4 are agreed and once Q5/Q4 resolve.
@@ -176,6 +163,7 @@ Still open: Q4, Q5, Q6, Q8.
 - **D29** — `merge-pr` **does the roadmap retirement** as a pre-merge action: if the PR ships the **last** piece of the item, run the 7-step retire-into-docs (move remaining content to canonical docs, delete the `.mdx`, update `roadmap/index.mdx`, sidebar/overview audits); if only **partial**, move `**Status**` to *Partially implemented* with remaining phases named. Feature/user docs themselves are written during implementation (`goal`); `merge-pr` owns the roadmap-item retirement specifically.
 - **D30** — `merge-pr` **polls CI until green**, then merges; stops if any check fails (no `--admin` bypass without explicit per-failure opt-in).
 - **D31** — `merge-pr` **trusts CI green** (`gh pr checks` all pass) as the gate; no local fmt/clippy/nextest re-run.
+- **D32** — **Drop `review-pr` and `goal` from the build set.** `review-pr` is not built — use `/code-review` (and `/code-review ultra`) directly. `goal` is an **existing external skill** (the universal spec-runner `/goal Implement <item> | Follow <brief>`), referenced by the pipeline + `research` but **not authored in `jackin-dev`**.
 - **D23** — Boundary: `research` **gathers** (may add design *context/constraints*); `brainstorm` **decides** (writes the actual design choices). `brainstorm` may invoke `research` mid-design when it hits an unknown.
 - **D24** — `research` is **optional and reorderable** in the feature pipeline; not every item needs it.
 
@@ -235,7 +223,7 @@ PR mechanics shared by propose + create-pr: `cargo xtask pr body`
 | PR mechanics | `create-pr` | pure PR: variant classify, verify-block auto-select, 8-section body, heredoc `--body-file`, render self-check. The **small-fix path** (no roadmap item) and the PR-mechanics engine `propose` reuses. |
 | design | `brainstorm` | freeform discussion; writes design decisions incrementally into `## Design`. |
 | plan | `plan` | break `## Design` → `## Tasks` |
-| run | `goal` | **universal spec-runner.** `/goal Implement <slug>.md` builds a finalized roadmap item; `/goal Follow <brief>` executes a research brief into a dossier. *(parked — deep-design later)* |
+| run | `goal` *(external — not built here)* | the universal spec-runner you already use: `/goal Implement <slug>.md` builds a finalized roadmap item; `/goal Follow <brief>` executes a research brief. Referenced by the pipeline, authored elsewhere. |
 
 Adjacent (not in the linear feature path):
 
