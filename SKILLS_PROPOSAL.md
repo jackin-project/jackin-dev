@@ -370,3 +370,38 @@ jackin' mounts credentials for **claude, codex, amp, kimi, opencode** — skills
 
 ### Authoring consequence
 Write every skill to the **portable SKILL.md spec** (not Claude-only features): required `name`/`description` frontmatter, markdown body, reference files one level deep, forward-slash paths, Rust-binary scripts shelled out by path. Avoid Claude-plugin-only constructs in the skill body so the same file works unmodified on all five agents.
+
+---
+
+## 12. Authoring standard for the 5 skills (efficiency + predictability)
+
+Synthesized from Anthropic's skill best-practices, `obra/superpowers` `writing-skills`, and current field guides. These rules make our skills lean, predictable, and portable. Each becomes a checklist item when we author a SKILL.md.
+
+### Manual-only, the right way (upgrades D8)
+- **D38** — Enforce manual-only with **frontmatter**, not just wording: set **`disable-model-invocation: true`** on every jackin-dev SKILL.md (the platform lever that stops auto-firing). Keep the description explicit as the cross-agent fallback for agents lacking that field. This is the proper mechanism behind D8 — descriptions alone are a weaker guarantee.
+- Description still phrased third-person "Use when the operator runs `/jackin-dev:<name>` …", **what + when only — never summarize the workflow** (workflow lives in the body, loaded on trigger).
+
+### Standard SKILL.md skeleton (all 5)
+- **D39** — Every skill follows one skeleton for predictability:
+  1. **frontmatter** — `name`, `description` (≤1024 chars), `disable-model-invocation: true`.
+  2. **Overview** — 1–2 sentence core purpose.
+  3. **When to use / When NOT to use** — include the negative cases (e.g. `propose` not for small fixes; `create-pr` not for features). Testing both directions is a best-practice.
+  4. **Flags** — table, executable args early.
+  5. **Process** — the ordered flow.
+  6. **Common mistakes** — the rationalizations to block.
+  Body **≤500 lines**; reference files one level deep; forward-slash paths.
+
+### Degrees of freedom — resolve the "don't over-specify" tension
+- **D40** — Match specificity to fragility (the one rule that reconciles "describe outcomes, not steps" with our fixed sequences):
+  - **Fragile / order-dependent / consistency-critical** → exact steps + push to a **Rust binary** (capsule `--capsule` ordering, squash `(#N)` + trailers, the 5-artifact schema gate, roadmap retirement). "Do not modify the command."
+  - **Judgment** → describe the outcome, give constraints, let the agent adapt (`brainstorm` discussion, PR prose sections). Don't script these.
+
+### Predictability patterns to apply
+- **Fail-closed gates as explicit STOPs** — `merge-pr` lists each gate as a hard STOP with the rule it enforces; add a short "Red flags — STOP" list (superpowers pattern) for the auth/CI/retirement gates.
+- **Flowcharts only for real decision points / loops** — `create-pr` change-classification, `merge-pr` gate sequence. Never for linear steps or reference.
+- **Checklists for multi-step flows** — copy-into-response checklist for `propose` and `merge-pr` so progress is trackable.
+- **Cross-reference, don't inline** — point at rule files / other skills by name (`REQUIRED BACKGROUND: …`); never `@`-force-load (wastes context). Consistent with §3.
+- **Conciseness** — only add what the agent doesn't already know; the auto-loaded rule files carry the rest. Trim every sentence that exists in two places.
+
+### Testing before ship
+- **D41** — Author each skill against failing scenarios first (RED→GREEN): run the target flow **without** the skill, capture the wrong behavior, write the minimal skill that fixes exactly that, re-test with the skill present including **non-activation** cases. No skill ships untested.
