@@ -196,7 +196,7 @@ Borrowed: OpenSpec artifact roles + propose→archive discipline; superpowers br
 
 Settled specs land here as we brainstorm each skill. Status 🟢 = agreed.
 
-### 10.1 `propose` 🟢
+### 10.1 `propose` 🟢 — BUILT (`skills/<name>/SKILL.md`)
 
 **Purpose:** open a new **feature/idea** as a roadmap item plus an early PR. Never writes code — it collects everything needed for the roadmap item, then stops.
 
@@ -223,7 +223,7 @@ Settled specs land here as we brainstorm each skill. Status 🟢 = agreed.
 
 **Open thread:** if you already have a roadmap-item skill whose behavior should carry over, point me at it; otherwise `propose` supersedes it.
 
-### 10.2 `create-pr` 🟢
+### 10.2 `create-pr` 🟢 — BUILT (`skills/<name>/SKILL.md`)
 
 **Purpose:** open a PR for a **small fix** (no roadmap item), and serve as the shared PR-mechanics path. Commits inline; no separate commit skill.
 
@@ -245,7 +245,7 @@ Settled specs land here as we brainstorm each skill. Status 🟢 = agreed.
 
 **Not for:** feature/idea work (use `propose`); implementation (use `goal`).
 
-### 10.3 `research` 🟢
+### 10.3 `research` 🟢 — BUILT (`skills/<name>/SKILL.md`)
 
 **Purpose:** produce a **standalone research dossier** — a multi-page deliverable published on the docs site — for an open question or roadmap topic. Brief-driven and executed end-to-end. Gathers + synthesizes evidence (web + codebase); does not make product design decisions.
 
@@ -289,7 +289,7 @@ Parent `docs/content/docs/research/meta.json` lists each dossier under `pages`.
 **Calls:** `deep-research` (web) and, for execution, `goal`. **Does not** write code or design decisions.
 **xtask candidates:** `research scaffold <slug>` (create folder + meta.json + brief stub), `research check` (validate meta.json pages match files on disk).
 
-### 10.4 `brainstorm` 🟢
+### 10.4 `brainstorm` 🟢 — BUILT (`skills/<name>/SKILL.md`)
 
 **Purpose:** turn an item's intent + gathered research into concrete **design decisions** in `## Design`, through freeform discussion.
 
@@ -312,7 +312,7 @@ Parent `docs/content/docs/research/meta.json` lists each dossier under `pages`.
 
 **xtask needed:** none beyond `change` helpers; both skills edit the `.mdx` directly and commit.
 
-### 10.5 `merge-pr` 🟢
+### 10.5 `merge-pr` 🟢 — BUILT (`skills/<name>/SKILL.md`)
 
 **Purpose:** run the jackin' pre-merge gate and squash-merge a PR, including roadmap-item retirement. Fail-closed; reuses `.github/` agent rules (it sequences them, doesn't restate them).
 
