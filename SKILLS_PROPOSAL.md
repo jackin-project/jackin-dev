@@ -389,7 +389,8 @@ Synthesized from Anthropic's skill best-practices, `obra/superpowers` `writing-s
   4. **Flags** — table, executable args early.
   5. **Process** — the ordered flow.
   6. **Common mistakes** — the rationalizations to block.
-  Body **≤500 lines**; reference files one level deep; forward-slash paths.
+  Body **target ~100 lines, ≤500 hard cap** (mattpocock: aim ~100, split past 500); reference files one level deep; forward-slash paths.
+- **Description = two sentences** (mattpocock): sentence 1 states *what*; sentence 2 = "Use when the operator runs `/jackin-dev:<name>`." No keyword blob.
 
 ### Degrees of freedom — resolve the "don't over-specify" tension
 - **D40** — Match specificity to fragility (the one rule that reconciles "describe outcomes, not steps" with our fixed sequences):
