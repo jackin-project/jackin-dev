@@ -28,6 +28,8 @@ The feature path is `propose → brainstorm → /goal Implement <slug>.md → me
 
 ## Installation
 
+Skills are written once in the portable `SKILL.md` format and work across every agent jackin' supports. Each agent installs through its own channel.
+
 ### Claude Code
 
 ```
@@ -37,11 +39,19 @@ The feature path is `propose → brainstorm → /goal Implement <slug>.md → me
 
 ### Codex
 
-See [.codex/INSTALL.md](.codex/INSTALL.md).
+Codex reads `.codex-plugin/plugin.json`. See [.codex/INSTALL.md](.codex/INSTALL.md).
+
+### OpenCode
+
+OpenCode discovers the `skills/` directory via `opencode.json`. See [.opencode/INSTALL.md](.opencode/INSTALL.md).
 
 ### Amp Code
 
-Amp reads `AGENTS.md` and discovers skills from `.claude/skills/` compatibility paths. Point Amp at this repo or symlink the skills directory.
+Amp reads `AGENTS.md` and discovers skills from `.claude/skills/` compatibility paths. Point Amp at this repo or symlink the `skills/` directory into `.agents/skills/`.
+
+### Kimi Code CLI
+
+Kimi loads Agent Skills from project/user skill directories. Symlink the `skills/` directory (or individual skills) into your project's `.kimi` skill path, or reference them from `AGENTS.md`.
 
 ## Requirements
 
