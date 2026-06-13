@@ -150,3 +150,54 @@ Smoke-testing, docs/roadmap sync, capsule fixtures, CI authoring. To be specced 
 - **D4** — Home = `jackin-dev` plugin, alongside `release*`, marketplace-installed.
 
 Still open: Q4, Q5, Q6, Q8.
+
+- **D5** — Build our **own** spec-driven workflow, OpenSpec-*inspired* (artifact roles + lifecycle discipline) and superpowers-*method* (brainstorming). Do **not** install OpenSpec: no `openspec/` dir, no JS CLI — it would duplicate the roadmap + docs and fight jackin's single-source / docs-as-spec rules.
+- **D6** — **Archive = documentation.** When a feature ships, docs are updated and the roadmap item is retired into them (existing rule). Docs are the archive; no archive folder.
+- **D7** — Release notes are **out of scope** for now. Possible future stage; not required.
+- **D8** — Triggering is **explicit `/invoke` only** (no auto-fire). Slugs carry no `jackin-` prefix — the `jackin-dev:` plugin namespace is the prefix.
+- **D9** — Any non-trivial scripting is **Rust**, compiled into a binary the skills shell out to — not shell or JS. Mechanical lifecycle ops (scaffold/strip roadmap item, validate sections, schema-check, trailers) become subcommands. Leaning toward `cargo xtask` subcommands in the jackin' repo (reusable by CI → PR/main parity, alongside existing `pty-fixture`, `jackin-pr-trailers`, `pr prepare`). Home of the binary is open (Q9).
+
+---
+
+## 8. Workflow model — jackin'-native spec-driven pipeline
+
+No new tooling. The **roadmap item `.mdx` is the living change-spec** while a change is open; on ship it retires into canonical docs.
+
+Roadmap `.mdx` sections while a change is **active**:
+
+| Section | Role (OpenSpec analogue) | State |
+|---|---|---|
+| `## Problem` | why / scope (proposal.md) | exists today |
+| `## Why It Matters` | impact (proposal.md) | exists today |
+| `## Design` | how / approach (design.md) | **added while active**, filled by brainstorm |
+| `## Tasks` | checklist (tasks.md) | **added while active**, filled by plan |
+| `## Related Files` | touch-points | exists today |
+| `**Status**` | Open → Partially implemented → retired | exists today |
+
+On ship: update user + contributor docs, strip `## Design`/`## Tasks`, retire the item per the existing retirement rule. **That is the archive.**
+
+Lifecycle:
+
+```
+propose ─► [create-pr] ─► [brainstorm → ## Design] ─► [plan → ## Tasks] ─► implement ─► [merge-pr → retire into docs]
+                │
+                └─ fork at open time:
+                   • tracked change → scaffold roadmap item draft
+                   • quick PR (fix/chore/docs) → no roadmap item
+                   then if tracked: brainstorm-only │ implement-now
+```
+
+## 9. Skill pipeline (revised from §4)
+
+**Pipeline skills** (the spec-driven front-to-back):
+
+| Stage | Skill | Owns |
+|---|---|---|
+| open | `create-pr` | branch + early PR; tracked-vs-quick fork; if tracked, scaffold roadmap item draft + brainstorm/implement fork |
+| design | `brainstorm` | Socratic refinement + optional research → fills `## Design` (superpowers method) |
+| plan | `plan` | break `## Design` → `## Tasks` |
+| finish | `merge-pr` | verify, reconcile, retire roadmap item into docs, squash-merge |
+
+**Standalone skills** (unchanged, fire on their own intents): `review-pr`, `bump-schema`, `sync-docs`, `smoke-test`, `capsule-fixture`, `author-workflow`.
+
+Borrowed: OpenSpec artifact roles + propose→archive discipline; superpowers brainstorming. Adapted onto jackin's existing roadmap + docs, no parallel structures.
