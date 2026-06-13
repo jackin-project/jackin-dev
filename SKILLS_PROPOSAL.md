@@ -368,5 +368,7 @@ jackin' mounts credentials for **claude, codex, amp, kimi, opencode** — skills
   Superpowers ships exactly this set (`.claude-plugin`, `.codex-plugin`, `.cursor-plugin`, `.opencode/`, `gemini-extension.json`) over one `skills/` tree; jackin-dev mirrors it for jackin's five agents (drop cursor/gemini). Supersedes the earlier custom-`xtask skills sync` idea.
 - **D36** — **Invocation is not identical across agents.** The manual `/jackin-dev:<name>` namespaced slash command is a Claude-plugin convention. On codex/amp/kimi/opencode the trigger may be the bare skill name or "read and follow `skills/<name>/SKILL.md`". The **manual-only rule (D8) still holds everywhere**; only the literal trigger string differs. Each SKILL.md description stays explicit-invocation-oriented so no agent auto-fires it.
 
+- **D37** — **Build set = 6 skills** (`propose`, `research`, `brainstorm`, `plan`, `create-pr`, `merge-pr`). The 5 standalones (`smoke-test`, `sync-docs`, `capsule-fixture`, `author-workflow`) and `review-pr` are **dropped** — covered by auto-loaded rules + existing tooling. `plan` kept at light spec, no deep-dive.
+
 ### Authoring consequence
 Write every skill to the **portable SKILL.md spec** (not Claude-only features): required `name`/`description` frontmatter, markdown body, reference files one level deep, forward-slash paths, Rust-binary scripts shelled out by path. Avoid Claude-plugin-only constructs in the skill body so the same file works unmodified on all five agents.
