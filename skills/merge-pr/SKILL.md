@@ -6,11 +6,11 @@ disable-model-invocation: true
 
 # merge-pr
 
-Sequence the jackin' pre-merge gates **fail-closed**, retire the roadmap item into docs, then squash-merge. Reuses the `.github/` agent rules (auto-loaded) and `PULL_REQUESTS.md` — it sequences them, does not restate them.
+Sequence the jackin' pre-merge gates **fail-closed**, retire the roadmap item into docs, then squash-merge. Reuses the `.github/` agent rules (auto-loaded) and `PULL_REQUESTS.md` — sequences them, never restates them.
 
 ## When to use
 
-- The operator runs `/jackin-dev:merge-pr [<PR>]` to merge a jackin' PR (defaults to the current branch's PR).
+- Operator runs `/jackin-dev:merge-pr [<PR>]` to merge a jackin' PR (defaults to the current branch's PR).
 
 ## When NOT to use
 
@@ -48,4 +48,4 @@ Sequence the jackin' pre-merge gates **fail-closed**, retire the roadmap item in
 
 ## Tooling
 
-Bundles `jackin-pr-trailers` (exists). A `cargo xtask roadmap retire <slug>` / `roadmap audit` helper (to be added) can mechanize the retirement steps; until then, do them directly.
+Bundles `jackin-pr-trailers` (exists). `cargo xtask roadmap retire <slug>` / `roadmap audit` (to be added) can mechanize the retirement steps; until then, do them directly.

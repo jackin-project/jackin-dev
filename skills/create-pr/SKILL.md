@@ -6,19 +6,19 @@ disable-model-invocation: true
 
 # create-pr
 
-Open a PR for a **small fix** in the jackin' repo — typo, dependency bump, one-line bugfix, doc tweak — that does not need a roadmap item. Also the shared PR-mechanics path other skills reuse. Commits inline; there is no separate commit skill.
+Open a PR for a **small fix** in the jackin' repo — typo, dependency bump, one-line bugfix, doc tweak — that needs no roadmap item. Also the shared PR-mechanics path other skills reuse. Commits inline; no separate commit skill.
 
-The jackin' rule files auto-load — `PULL_REQUESTS.md`, `.github/` agent rules, `BRANCHING.md`, `COMMITS.md`. This skill sequences them; it does not restate them. Read them for the full rules.
+jackin' rule files auto-load — `PULL_REQUESTS.md`, `.github/` agent rules, `BRANCHING.md`, `COMMITS.md`. This skill sequences them, never restates them. Read them for full rules.
 
 ## When to use
 
-- The operator runs `/jackin-dev:create-pr`.
-- The change is small and self-contained (no design, no roadmap item).
+- Operator runs `/jackin-dev:create-pr`.
+- Small, self-contained change (no design, no roadmap item).
 
 ## When NOT to use
 
-- A feature or idea worth a roadmap item → use `/jackin-dev:propose`.
-- Implementing a finalized roadmap item → use `/goal Implement <slug>.md`.
+- Feature/idea worth a roadmap item → `/jackin-dev:propose`.
+- Implementing a finalized roadmap item → `/goal Implement <slug>.md`.
 
 ## Arguments
 
@@ -28,9 +28,9 @@ The jackin' rule files auto-load — `PULL_REQUESTS.md`, `.github/` agent rules,
 
 ## Process
 
-1. **Branch.** Never commit to `main`. If on `main`, create a `fix/` / `chore/` / `docs/` / `refactor/`-prefixed branch named from the change. Suggest and confirm unless `--auto-branch` or `--branch` was given.
-2. **Commit.** If there are uncommitted changes, commit them inline per `COMMITS.md` — Conventional Commits subject, DCO sign-off (`git commit -s`). If already committed, skip. Then `git push`.
-3. **Build the body.** Start from `.github/PULL_REQUEST_TEMPLATE.md` in the repo (read it at runtime — never embed a copy). Fill the prose sections. Auto-select the Verify-locally blocks from the changed paths:
+1. **Branch.** Never commit to `main`. If on `main`, create a `fix/` / `chore/` / `docs/` / `refactor/`-prefixed branch named from the change. Suggest and confirm unless `--auto-branch` or `--branch` given.
+2. **Commit.** Uncommitted changes → commit inline per `COMMITS.md`: Conventional Commits subject, DCO sign-off (`git commit -s`). Already committed → skip. Then `git push`.
+3. **Build the body.** Start from `.github/PULL_REQUEST_TEMPLATE.md` in the repo (read at runtime — never embed a copy). Fill prose sections. Auto-select Verify-locally blocks from changed paths:
    - Checkout + isolation env vars (`JACKIN_CONFIG_DIR`, `JACKIN_HOME_DIR`) — **always**.
    - Rust tests — when Rust sources changed.
    - Docs checks + Documentation walk — when `docs/**` changed.
@@ -44,10 +44,10 @@ The jackin' rule files auto-load — `PULL_REQUESTS.md`, `.github/` agent rules,
 
 - Committing to `main` instead of a branch.
 - Embedding the PR template instead of reading `.github/PULL_REQUEST_TEMPLATE.md` at runtime.
-- Escaping backticks / `$` inside the heredoc, producing broken rendered Markdown.
-- Putting a `jackin console`/`load` step before the `--capsule` prepare for a capsule PR.
-- Linking deployed docs URLs in the body (they break post-merge) — refer to docs by name.
+- Escaping backticks / `$` inside the heredoc → broken rendered Markdown.
+- A `jackin console`/`load` step before the `--capsule` prepare on a capsule PR.
+- Deployed docs URLs in the body (break post-merge) — refer to docs by name.
 
 ## Tooling
 
-A `cargo xtask pr body` helper (to be added in the jackin' repo) can mechanize the template read + verify-block selection. Until it exists, do those steps directly.
+`cargo xtask pr body` (to be added in the jackin' repo) can mechanize the template read + verify-block selection. Until then, do those steps directly.

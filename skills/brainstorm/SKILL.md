@@ -8,11 +8,11 @@ disable-model-invocation: true
 
 Turn an existing roadmap item's intent (and any gathered research) into concrete **design decisions**, through open back-and-forth with the operator, written incrementally into the item's `## Design` section.
 
-This is a judgment task — describe and decide; do not script it, do not write code, do not break work into tasks (that is `plan`, deferred).
+Judgment task — describe and decide; do not script it, do not write code, do not break work into tasks (that is `plan`, deferred).
 
 ## When to use
 
-- The operator runs `/jackin-dev:brainstorm <slug>` to design an open roadmap item.
+- Operator runs `/jackin-dev:brainstorm <slug>` to design an open roadmap item.
 
 ## When NOT to use
 
@@ -30,7 +30,7 @@ This is a judgment task — describe and decide; do not script it, do not write 
 1. **Load context.** Read `docs/content/docs/reference/roadmap/<slug>.mdx` — Problem, Why It Matters, Design-so-far, Related Files — plus any research already linked.
 2. **Discuss freeform.** Open back-and-forth: surface alternatives, trade-offs, open questions. Pull in jackin' design principles and the relevant rule files (`ENGINEERING.md`, `HOST_AND_CONTAINER.md`, TUI/docs rules) as constraints. Prefer one question at a time; check in as each part settles.
 3. **Write incrementally.** As each point settles, append or update the matching part of `## Design` in the `.mdx` — the decision plus a one-line *why*. `--resume` picks up from there.
-4. **Hit an unknown?** Gather quickly (Explore/grep, or `deep-research`). For a large investigation, spin a separate `/jackin-dev:research` dossier and link it from `## Design`. Then resume deciding.
+4. **Hit an unknown?** Gather quickly (Explore/grep, or `deep-research`). Large investigation → spin a separate `/jackin-dev:research` dossier and link it from `## Design`. Then resume deciding.
 5. **Converge.** When `## Design` covers the approach end to end, summarize and point at the implementation step (`/goal Implement <slug>.md`).
 6. **Commit + push.** `docs:` per settled chunk (push after every commit).
 

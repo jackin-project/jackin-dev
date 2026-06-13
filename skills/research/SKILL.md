@@ -6,18 +6,18 @@ disable-model-invocation: true
 
 # research
 
-Produce a standalone **research dossier** — a multi-page deliverable published on the jackin' docs site — for an open question or roadmap topic. Brief-driven: author the brief, then execute it. Gathers and synthesizes evidence (web + codebase); it does not make product design decisions.
+Produce a standalone **research dossier** — a multi-page deliverable published on the jackin' docs site — for an open question or roadmap topic. Brief-driven: author the brief, then execute it. Gathers and synthesizes evidence (web + codebase); does not make product design decisions.
 
 Reference implementation: `docs/content/docs/research/token-optimization-research/` in the jackin' repo.
 
 ## When to use
 
-- The operator runs `/jackin-dev:research <slug>` for a substantial investigation.
+- Operator runs `/jackin-dev:research <slug>` for a substantial investigation.
 
 ## When NOT to use
 
 - Design decisions on a roadmap item → `/jackin-dev:brainstorm`.
-- A quick lookup → use `deep-research` or Explore directly, no dossier.
+- Quick lookup → `deep-research` or Explore directly, no dossier.
 
 ## Arguments
 
@@ -35,7 +35,7 @@ docs/content/docs/research/<slug>/
 ├── NN-*.mdx      # numbered chapters (00 summary, 01.. foundations, 10-20 areas, 30+ synthesis)
 └── tools/        # optional scripts + own meta.json + index.mdx
 ```
-Also add `<slug>` to the parent `docs/content/docs/research/meta.json` `pages`. Big research → its own folder (default); small → `--in-roadmap`.
+Also add `<slug>` to the parent `docs/content/docs/research/meta.json` `pages`. Big research → own folder (default); small → `--in-roadmap`.
 
 ## Process
 
@@ -49,7 +49,7 @@ Also add `<slug>` to the parent `docs/content/docs/research/meta.json` `pages`. 
 
 - Forcing a Problem/Why/Design shape — a dossier is free-form, not a roadmap item.
 - Making design decisions — that is `brainstorm`.
-- An unsourced external claim or a local number without its method.
+- An unsourced external claim, or a local number without its method.
 - `meta.json` `pages` out of sync with the files on disk.
 
 ## Tooling
