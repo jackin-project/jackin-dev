@@ -155,7 +155,10 @@ Still open: Q4, Q5, Q6, Q8.
 - **D6** — **Archive = documentation.** When a feature ships, docs are updated and the roadmap item is retired into them (existing rule). Docs are the archive; no archive folder.
 - **D7** — Release notes are **out of scope** for now. Possible future stage; not required.
 - **D8** — Triggering is **explicit `/invoke` only** (no auto-fire). Slugs carry no `jackin-` prefix — the `jackin-dev:` plugin namespace is the prefix.
-- **D9** — Any non-trivial scripting is **Rust**, compiled into a binary the skills shell out to — not shell or JS. Mechanical lifecycle ops (scaffold/strip roadmap item, validate sections, schema-check, trailers) become subcommands. Leaning toward `cargo xtask` subcommands in the jackin' repo (reusable by CI → PR/main parity, alongside existing `pty-fixture`, `jackin-pr-trailers`, `pr prepare`). Home of the binary is open (Q9).
+- **D9** — Any non-trivial scripting is **Rust**, compiled into a binary the skills shell out to — not shell or JS. Mechanical lifecycle ops (scaffold/strip roadmap item, validate sections, schema-check, trailers) become subcommands.
+- **D10** — The opener is a **separate `propose` skill**, not `create-pr`. `propose` owns idea→branch→forks→roadmap-item scaffold, then chains into `create-pr`. `create-pr` is pure PR mechanics (reusable standalone for quick PRs).
+- **D11** — The Rust lifecycle binary lives as **`cargo xtask` subcommands in the jackin' repo** (CI reuses them → PR/main parity; beside `pty-fixture`, `jackin-pr-trailers`, `pr prepare`).
+- **D12** — `brainstorm` and `plan` are **two skills**: `brainstorm` fills `## Design`, `plan` breaks it into `## Tasks`.
 
 ---
 
@@ -193,11 +196,14 @@ propose ─► [create-pr] ─► [brainstorm → ## Design] ─► [plan → ##
 
 | Stage | Skill | Owns |
 |---|---|---|
-| open | `create-pr` | branch + early PR; tracked-vs-quick fork; if tracked, scaffold roadmap item draft + brainstorm/implement fork |
+| open | `propose` | idea/problem → branch name → forks (tracked-vs-quick; if tracked, brainstorm-vs-implement); scaffolds roadmap item draft via `xtask change new`; chains into `create-pr` |
+| PR mechanics | `create-pr` | pure PR: variant classify, verify-block auto-select, 8-section body, heredoc `--body-file`, render self-check. Called by `propose`; standalone for quick PRs |
 | design | `brainstorm` | Socratic refinement + optional research → fills `## Design` (superpowers method) |
 | plan | `plan` | break `## Design` → `## Tasks` |
 | finish | `merge-pr` | verify, reconcile, retire roadmap item into docs, squash-merge |
 
 **Standalone skills** (unchanged, fire on their own intents): `review-pr`, `bump-schema`, `sync-docs`, `smoke-test`, `capsule-fixture`, `author-workflow`.
+
+> §5's S1 spec is now split: `propose` owns pre-flight/branch/fork/roadmap-scaffold; `create-pr` owns classify/select/draft/create. Full per-skill specs land in §10 as we deep-dive each.
 
 Borrowed: OpenSpec artifact roles + propose→archive discipline; superpowers brainstorming. Adapted onto jackin's existing roadmap + docs, no parallel structures.
