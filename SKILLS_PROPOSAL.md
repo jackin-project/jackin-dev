@@ -56,14 +56,13 @@ Home: the **`jackin-dev` plugin** (this repo), so the skills version with the to
 
 ## 4. Final build set
 
-The build set is the **6 spec-driven pipeline + research skills**. The earlier broader candidate list (smoke-test, sync-docs, capsule-fixture, author-workflow, review) is **dropped** — those flows stay covered by the auto-loaded rule files and existing tooling (`/code-review`, `/verify`, `cargo xtask pty-fixture`, etc.).
+The build set is the **5 spec-driven pipeline + research skills**. The earlier broader candidate list (smoke-test, sync-docs, capsule-fixture, author-workflow, review) is **dropped** — those flows stay covered by the auto-loaded rule files and existing tooling (`/code-review`, `/verify`, `cargo xtask pty-fixture`, etc.).
 
 | Skill | Role | Spec |
 |---|---|---|
 | `propose` | open a feature/idea → roadmap item draft + early PR (never codes) | §10.1 🟢 |
 | `research` | standalone research dossier on the docs site (web + codebase) | §10.3 🟢 |
 | `brainstorm` | freeform design discussion → writes `## Design` | §10.4 🟢 |
-| `plan` | break `## Design` → `## Tasks` (light spec; not deep-dived) | §9 / TBD |
 | `create-pr` | small-fix PR + shared PR-mechanics (template + verify-block auto-select) | §10.2 🟢 |
 | `merge-pr` | pre-merge gate + roadmap retirement + squash-merge | §10.5 🟢 |
 
@@ -77,9 +76,9 @@ Full per-skill specs live in §10; the pipeline in §8–§9. Sections 5 (old ge
 
 All major scope questions resolved (see Decisions log). Remaining:
 
-- **Q-plan** — `plan` left at light spec (§9 row): break `## Design` → `## Tasks`. Deep-dive when we get to authoring it.
+- **Q-plan** — `plan` DEFERRED out of the build set: break `## Design` → `## Tasks`. Revisit/improve later.
 - **Q-research-final** — `research` output format/placement matches jackin #583 dossier; confirm once the operator finalizes a second real example.
-- **Q-build-order** — which of the 6 to author first. Suggested: `create-pr` (smallest, shared mechanics) → `propose` → `merge-pr` → `brainstorm` → `research` → `plan`.
+- **Q-build-order** — which of the 5 to author first. Suggested: `create-pr` (smallest, shared mechanics) → `propose` → `merge-pr` → `brainstorm` → `research`.
 
 ---
 
@@ -146,9 +145,9 @@ Lifecycle:
 FEATURE / IDEA WORK
   propose            roadmap item draft + early PR  (NEVER codes; collects for the item, then stops)
     └► brainstorm    freeform discussion; writes decisions incrementally into ## Design
-        └► plan      fill ## Tasks
-            └► goal Implement <slug>.md   build the finalized roadmap item
-                └► merge-pr   retire the item into docs (the archive)
+        └► goal Implement <slug>.md   build the finalized roadmap item (external runner)
+            └► merge-pr   retire the item into docs (the archive)
+  (plan — break ## Design into ## Tasks — DEFERRED; add later)
 
 RESEARCH  (standalone dossier; default home = docs/content/docs/research/<slug>/)
   research          author brief (prompt.mdx) ──► goal Follow <brief>  ──► dossier published to docs
@@ -176,7 +175,6 @@ PR mechanics shared by propose + create-pr: `cargo xtask pr body`
 | open | `propose` | **feature/idea only, never codes.** idea → branch → scaffold roadmap item draft (`xtask change new`) → open early PR via `create-pr`. Collects everything for the item, then stops. |
 | PR mechanics | `create-pr` | pure PR: variant classify, verify-block auto-select, 8-section body, heredoc `--body-file`, render self-check. The **small-fix path** (no roadmap item) and the PR-mechanics engine `propose` reuses. |
 | design | `brainstorm` | freeform discussion; writes design decisions incrementally into `## Design`. |
-| plan | `plan` | break `## Design` → `## Tasks` |
 | run | `goal` *(external — not built here)* | the universal spec-runner you already use: `/goal Implement <slug>.md` builds a finalized roadmap item; `/goal Follow <brief>` executes a research brief. Referenced by the pipeline, authored elsewhere. |
 
 Adjacent (not in the linear feature path):
@@ -368,7 +366,7 @@ jackin' mounts credentials for **claude, codex, amp, kimi, opencode** — skills
   Superpowers ships exactly this set (`.claude-plugin`, `.codex-plugin`, `.cursor-plugin`, `.opencode/`, `gemini-extension.json`) over one `skills/` tree; jackin-dev mirrors it for jackin's five agents (drop cursor/gemini). Supersedes the earlier custom-`xtask skills sync` idea.
 - **D36** — **Invocation is not identical across agents.** The manual `/jackin-dev:<name>` namespaced slash command is a Claude-plugin convention. On codex/amp/kimi/opencode the trigger may be the bare skill name or "read and follow `skills/<name>/SKILL.md`". The **manual-only rule (D8) still holds everywhere**; only the literal trigger string differs. Each SKILL.md description stays explicit-invocation-oriented so no agent auto-fires it.
 
-- **D37** — **Build set = 6 skills** (`propose`, `research`, `brainstorm`, `plan`, `create-pr`, `merge-pr`). The 5 standalones (`smoke-test`, `sync-docs`, `capsule-fixture`, `author-workflow`) and `review-pr` are **dropped** — covered by auto-loaded rules + existing tooling. `plan` kept at light spec, no deep-dive.
+- **D37** — **Build set = 5 skills** (`propose`, `research`, `brainstorm`, `create-pr`, `merge-pr`). Dropped: the 5 standalones (`smoke-test`, `sync-docs`, `capsule-fixture`, `author-workflow`), `review-pr`, and **`plan`** (deferred — break `## Design` → `## Tasks`, add later). Dropped flows stay covered by auto-loaded rules + existing tooling.
 
 ### Authoring consequence
 Write every skill to the **portable SKILL.md spec** (not Claude-only features): required `name`/`description` frontmatter, markdown body, reference files one level deep, forward-slash paths, Rust-binary scripts shelled out by path. Avoid Claude-plugin-only constructs in the skill body so the same file works unmodified on all five agents.
