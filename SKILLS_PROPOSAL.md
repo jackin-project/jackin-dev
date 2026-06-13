@@ -37,7 +37,7 @@ Already covered by existing skills (do **not** rebuild): `release`, `release-che
 These shape *how* each skill is written, not *whether*:
 
 - **Naming:** gerund form, lowercase-hyphen, ≤64 chars. e.g. `opening-jackin-prs`.
-- **Description:** third person, states **what + when**, packs trigger keywords, ≤1024 chars. This is the *only* thing pre-loaded — it decides whether the skill fires.
+- **Description:** third person, states **what**, ≤1024 chars. **For jackin-dev: the trigger is the explicit `/invoke` itself (D8) — do NOT pack intent keywords that auto-fire the skill.** Phrase as "Use when the operator runs `/jackin-dev:<name>`."
 - **Body ≤500 lines.** Overflow → split into reference files, linked **one level deep** from SKILL.md.
 - **Degrees of freedom:** fragile fixed sequences (schema bump, capsule ordering, squash/trailers) → **low freedom** (exact commands, "do not modify"). Judgment tasks (review) → **high freedom** (heuristics).
 - **Scripts for deterministic checks** beat prose: a validator that *asserts* the 5 migration artifacts exist is more reliable than a checklist Claude eyeballs.
@@ -141,7 +141,7 @@ Still open: Q4, Q5, Q6, Q8.
 - **D5** — Build our **own** spec-driven workflow, OpenSpec-*inspired* (artifact roles + lifecycle discipline) and superpowers-*method* (brainstorming). Do **not** install OpenSpec: no `openspec/` dir, no JS CLI — it would duplicate the roadmap + docs and fight jackin's single-source / docs-as-spec rules.
 - **D6** — **Archive = documentation.** When a feature ships, docs are updated and the roadmap item is retired into them (existing rule). Docs are the archive; no archive folder.
 - **D7** — Release notes are **out of scope** for now. Possible future stage; not required.
-- **D8** — Triggering is **explicit `/invoke` only** (no auto-fire). Slugs carry no `jackin-` prefix — the `jackin-dev:` plugin namespace is the prefix.
+- **D8** — Triggering is **explicit `/invoke` only — HARD RULE, no exceptions.** **No jackin-dev skill may ever auto-fire.** The operator invokes every skill manually and only one way: `/jackin-dev:<name>`. Authoring consequence: each SKILL.md `description` must be written so the **trigger is the explicit invocation itself** (e.g. "Use when the operator runs `/jackin-dev:propose`. …") — describe what the skill does, but do **not** pack intent keywords that would make the harness auto-select it. Slugs carry no `jackin-` prefix — the `jackin-dev:` plugin namespace is the prefix.
 - **D9** — Any non-trivial scripting is **Rust**, compiled into a binary the skills shell out to — not shell or JS. Mechanical lifecycle ops (scaffold/strip roadmap item, validate sections, schema-check, trailers) become subcommands.
 - **D10** — The opener is a **separate `propose` skill**, not `create-pr`. `propose` owns idea→branch→forks→roadmap-item scaffold, then chains into `create-pr`. `create-pr` is pure PR mechanics (reusable standalone for quick PRs).
 - **D11** — The Rust lifecycle binary lives as **`cargo xtask` subcommands in the jackin' repo** (CI reuses them → PR/main parity; beside `pty-fixture`, `jackin-pr-trailers`, `pr prepare`).
