@@ -159,6 +159,10 @@ Still open: Q4, Q5, Q6, Q8.
 - **D10** — The opener is a **separate `propose` skill**, not `create-pr`. `propose` owns idea→branch→forks→roadmap-item scaffold, then chains into `create-pr`. `create-pr` is pure PR mechanics (reusable standalone for quick PRs).
 - **D11** — The Rust lifecycle binary lives as **`cargo xtask` subcommands in the jackin' repo** (CI reuses them → PR/main parity; beside `pty-fixture`, `jackin-pr-trailers`, `pr prepare`).
 - **D12** — `brainstorm` and `plan` are **two skills**: `brainstorm` fills `## Design`, `plan` breaks it into `## Tasks`.
+- **D13** — `propose` is for **feature/idea work only** and **never writes code**. It collects everything into the roadmap item (branch + draft + early PR) and stops; implementation is always a separate later step. The brainstorm-vs-implement fork is removed from `propose`.
+- **D14** — **Small fixes** (typo, dep bump, one-line fix, doc tweak) skip `propose` and use `create-pr` directly — no roadmap item.
+- **D15** — Research reuses the existing built-in **`deep-research`** skill (no new research skill); `propose`/`brainstorm` call it on demand (`--research`).
+- **D16** — Skills accept **arguments/flags** (e.g. `/jackin-dev:propose <idea> --auto-branch --no-pr`). Branch auto-naming is a per-call `--auto-branch` flag, not saved state.
 
 ---
 
@@ -182,12 +186,15 @@ On ship: update user + contributor docs, strip `## Design`/`## Tasks`, retire th
 Lifecycle:
 
 ```
-propose ─► [create-pr] ─► [brainstorm → ## Design] ─► [plan → ## Tasks] ─► implement ─► [merge-pr → retire into docs]
-                │
-                └─ fork at open time:
-                   • tracked change → scaffold roadmap item draft
-                   • quick PR (fix/chore/docs) → no roadmap item
-                   then if tracked: brainstorm-only │ implement-now
+FEATURE / IDEA WORK
+  propose            roadmap item draft + early PR  (NEVER codes; collects for the item, then stops)
+    └► brainstorm    fill ## Design  (Socratic + optional deep-research)
+        └► plan      fill ## Tasks
+            └► implement      separate step, a later session/skill
+                └► merge-pr   retire the item into docs (the archive)
+
+SMALL FIX  (typo, dep bump, one-line fix, doc tweak)
+  create-pr          branch + commits + PR, no roadmap item
 ```
 
 ## 9. Skill pipeline (revised from §4)
@@ -196,8 +203,8 @@ propose ─► [create-pr] ─► [brainstorm → ## Design] ─► [plan → ##
 
 | Stage | Skill | Owns |
 |---|---|---|
-| open | `propose` | idea/problem → branch name → forks (tracked-vs-quick; if tracked, brainstorm-vs-implement); scaffolds roadmap item draft via `xtask change new`; chains into `create-pr` |
-| PR mechanics | `create-pr` | pure PR: variant classify, verify-block auto-select, 8-section body, heredoc `--body-file`, render self-check. Called by `propose`; standalone for quick PRs |
+| open | `propose` | **feature/idea only, never codes.** idea → branch → scaffold roadmap item draft (`xtask change new`) → open early PR via `create-pr`. Collects everything for the item, then stops. |
+| PR mechanics | `create-pr` | pure PR: variant classify, verify-block auto-select, 8-section body, heredoc `--body-file`, render self-check. The **small-fix path** (no roadmap item) and the PR-mechanics engine `propose` reuses. |
 | design | `brainstorm` | Socratic refinement + optional research → fills `## Design` (superpowers method) |
 | plan | `plan` | break `## Design` → `## Tasks` |
 | finish | `merge-pr` | verify, reconcile, retire roadmap item into docs, squash-merge |
@@ -207,3 +214,36 @@ propose ─► [create-pr] ─► [brainstorm → ## Design] ─► [plan → ##
 > §5's S1 spec is now split: `propose` owns pre-flight/branch/fork/roadmap-scaffold; `create-pr` owns classify/select/draft/create. Full per-skill specs land in §10 as we deep-dive each.
 
 Borrowed: OpenSpec artifact roles + propose→archive discipline; superpowers brainstorming. Adapted onto jackin's existing roadmap + docs, no parallel structures.
+
+---
+
+## 10. Per-skill specs (deep-dive results)
+
+Settled specs land here as we brainstorm each skill. Status 🟢 = agreed.
+
+### 10.1 `propose` 🟢
+
+**Purpose:** open a new **feature/idea** as a roadmap item plus an early PR. Never writes code — it collects everything needed for the roadmap item, then stops.
+
+**Invocation:** `/jackin-dev:propose <idea or problem text> [flags]`
+
+| Flag | Effect |
+|---|---|
+| `--branch <name>` | explicit branch name |
+| `--auto-branch` | name the branch itself, no confirm |
+| `--no-pr` | branch + roadmap draft only, no PR (rare; default always opens a PR) |
+| `--research` | run `deep-research` first, fold findings into the draft |
+
+**Flow:**
+1. **Branch** — never commit to `main`. Derive `feature/<slug>` (or `fix/`,`refactor/`,`chore/` per change type) from the idea; suggest + confirm. Skip the confirm when `--auto-branch` or `--branch` given.
+2. **(optional) Research** — on `--research`, call `deep-research`; summarize findings into the draft.
+3. **Scaffold roadmap item** — `cargo xtask change new <slug>` creates `docs/content/docs/reference/roadmap/<slug>.mdx` with `**Status**: Open`, `## Problem`, `## Why It Matters`, empty `## Design`, `## Tasks`, `## Related Files`; adds the sidebar entry under Roadmap → Open items in `astro.config.ts`; runs the sidebar/overview audit. Fill Problem / Why It Matters from the idea text.
+4. **Commit + push** — `docs:` type, DCO `-s`.
+5. **Open PR** — immediately, unless `--no-pr`, via `create-pr` mechanics. Summary = the idea; What ships = "roadmap item draft for `<slug>`"; Verify = docs render.
+6. **Stop.** Point the user at next steps: `/jackin-dev:brainstorm <slug>` to fill `## Design`.
+
+**Never:** write source code, run an implementation, or fill `## Design` / `## Tasks` (those are `brainstorm` / `plan`).
+
+**xtask needed:** `change new`.
+
+**Open thread:** if you already have a roadmap-item skill whose behavior should carry over, point me at it; otherwise `propose` supersedes it.
