@@ -168,7 +168,10 @@ Still open: Q4, Q5, Q6, Q8.
 - **D19** — PR mechanics live in a shared Rust helper **`cargo xtask pr body`** (reads the template, auto-selects verify-locally blocks from the diff). `propose` and `create-pr` both call it and open their own PR — **no skill calls another skill.**
 - **D20** — Implementation is the **`goal`** skill: `/goal Implement <slug>.md` builds a finalized roadmap item. Parked for later deep-design.
 - **D21** — `brainstorm` runs as **freeform discussion** (not rigid Socratic), and writes decisions **incrementally into `## Design`** as each point settles (resumable across sessions).
-- **D22** — ~~`research` folds findings into Problem / Why / Design.~~ **REVERSED.** `research` produces a **standalone, free-form, multi-document brief** (not bound to the roadmap Problem/Why/Design shape), destined to be **published on the docs website**. Reference example: jackin PR #583 (`token-optimization-research.md` + `token-optimization-research/` directory of ~30 numbered chapters: executive summary, economics, baseline audit, prior-art scan, per-topic deep dives, composed stacks, validation harness, adoption roadmap). Final format/output-location TBD — operator finalizing a real example, then we spec. `research` still covers both web (`deep-research`) and codebase.
+- **D22** — ~~`research` folds findings into Problem / Why / Design.~~ **REVERSED → FINAL (see D25).** `research` produces a **standalone multi-page dossier** published on the docs website. Reference: jackin `docs/content/docs/research/token-optimization-research/` (PR #583): `meta.json` + `index.mdx` + `prompt.mdx` (the brief) + numbered chapters + optional `tools/`. Covers web (`deep-research`) + codebase.
+- **D25** — Research **storage**: default = **separate dossier folder** `docs/content/docs/research/<slug>/`; **inline in the roadmap item only on explicit request** (`--in-roadmap`) and only for small research. Big research always gets its own folder.
+- **D26** — **`goal` is the universal spec-runner.** `/goal Follow <path>` (or `/goal Implement <path>`) executes any self-contained spec file end-to-end: a **roadmap item** → implement code; a **research brief** (`prompt.mdx`) → produce the dossier. Same skill, the spec decides the work. (The token-optimization brief documents its own run line as `/goal Follow token-optimization-research.md`.)
+- **D27** — Research sidebar wiring (`meta.json` per dossier + parent `research/meta.json`) is mechanical → **xtask candidates** `research scaffold <slug>` and `research check` (pages[] match files on disk).
 - **D23** — Boundary: `research` **gathers** (may add design *context/constraints*); `brainstorm` **decides** (writes the actual design choices). `brainstorm` may invoke `research` mid-design when it hits an unknown.
 - **D24** — `research` is **optional and reorderable** in the feature pipeline; not every item needs it.
 
@@ -196,12 +199,19 @@ Lifecycle:
 ```
 FEATURE / IDEA WORK
   propose            roadmap item draft + early PR  (NEVER codes; collects for the item, then stops)
-    └► research      (optional) web + codebase; folds findings into Problem/Why/Design context
-        └► brainstorm    freeform discussion; writes decisions incrementally into ## Design
-            └► plan      fill ## Tasks
-                └► goal   implement a FINALIZED roadmap item  (e.g. /goal Implement <slug>.md)
-                    └► merge-pr   retire the item into docs (the archive)
-  (research is optional + reorderable: brainstorm may call research mid-design when it hits an unknown)
+    └► brainstorm    freeform discussion; writes decisions incrementally into ## Design
+        └► plan      fill ## Tasks
+            └► goal Implement <slug>.md   build the finalized roadmap item
+                └► merge-pr   retire the item into docs (the archive)
+
+RESEARCH  (standalone dossier; default home = docs/content/docs/research/<slug>/)
+  research          author brief (prompt.mdx) ──► goal Follow <brief>  ──► dossier published to docs
+  (small research may be stored --in-roadmap instead; big research always a separate folder)
+
+SMALL FIX  (typo, dep bump, one-line fix, doc tweak)
+  create-pr          branch + inline commit + PR, no roadmap item
+
+goal = universal spec-runner: /goal {Implement|Follow} <spec>. Roadmap item → code; research brief → dossier.
 
 SMALL FIX  (typo, dep bump, one-line fix, doc tweak)
   create-pr          branch + inline commit + PR, no roadmap item
@@ -219,10 +229,15 @@ PR mechanics shared by propose + create-pr: `cargo xtask pr body`
 |---|---|---|
 | open | `propose` | **feature/idea only, never codes.** idea → branch → scaffold roadmap item draft (`xtask change new`) → open early PR via `create-pr`. Collects everything for the item, then stops. |
 | PR mechanics | `create-pr` | pure PR: variant classify, verify-block auto-select, 8-section body, heredoc `--body-file`, render self-check. The **small-fix path** (no roadmap item) and the PR-mechanics engine `propose` reuses. |
-| research | `research` | (optional) reads the item, runs web (`deep-research`) + codebase exploration, folds findings into Problem/Why/Design context. Gathers, never decides. |
-| design | `brainstorm` | freeform discussion; writes design decisions incrementally into `## Design`. May call `research` on an unknown. |
+| design | `brainstorm` | freeform discussion; writes design decisions incrementally into `## Design`. |
 | plan | `plan` | break `## Design` → `## Tasks` |
-| implement | `goal` | implement a **finalized** roadmap item: `/goal Implement <slug>.md`. Reads Problem/Why/Design/Tasks, builds it, updates docs. *(parked — deep-design later)* |
+| run | `goal` | **universal spec-runner.** `/goal Implement <slug>.md` builds a finalized roadmap item; `/goal Follow <brief>` executes a research brief into a dossier. *(parked — deep-design later)* |
+
+Adjacent (not in the linear feature path):
+
+| Skill | Owns |
+|---|---|
+| `research` | author a research **brief** (`prompt.mdx`) and produce a standalone **dossier** under `docs/content/docs/research/<slug>/` (web `deep-research` + codebase). Executed via `goal`. Default separate folder; `--in-roadmap` for small. |
 | finish | `merge-pr` | verify, reconcile, retire roadmap item into docs, squash-merge |
 
 **Standalone skills** (unchanged, fire on their own intents): `review-pr`, `bump-schema`, `sync-docs`, `smoke-test`, `capsule-fixture`, `author-workflow`.
@@ -286,29 +301,49 @@ Settled specs land here as we brainstorm each skill. Status 🟢 = agreed.
 
 **Not for:** feature/idea work (use `propose`); implementation (use `goal`).
 
-### 10.3 `research` 🟡 PARKED — awaiting operator's finalized example
+### 10.3 `research` 🟢
 
-> **Revised direction (supersedes the spec below).** `research` is a **heavyweight, free-form, multi-document deliverable**, not a roadmap-section enricher. It produces a standalone research brief (root summary `.md` + a directory of numbered chapters) destined for the **docs website**, like jackin PR #583. It does **not** force a Problem/Why/Design shape. The operator is finalizing a real research artifact and will share the final view; we spec format, output path, docs-site placement, and whether it attaches to a roadmap item *after* that. The flow below is retained only as raw notes on the web+codebase gathering mechanics.
+**Purpose:** produce a **standalone research dossier** — a multi-page deliverable published on the docs site — for an open question or roadmap topic. Brief-driven and executed end-to-end. Gathers + synthesizes evidence (web + codebase); does not make product design decisions.
 
-**Purpose (mechanics retained):** gather evidence — external prior art (`deep-research`) + current jackin' codebase reality — into a research brief. Gathers, never decides.
+**Reference implementation:** jackin `docs/content/docs/research/token-optimization-research/` (PR #583).
+
+**Canonical output layout** (fumadocs):
+
+```
+docs/content/docs/research/<slug>/
+├── meta.json          # { title, defaultOpen:false, pages:[...] }  — sidebar order
+├── index.mdx          # dossier landing: headline numbers, how-to-read, tier list
+├── prompt.mdx         # the research BRIEF that was run (the spec; carries the /goal run line)
+├── NN-*.mdx           # numbered chapters (00 summary, 01.. foundations, 10-20 areas, 30+ synthesis)
+└── tools/             # optional: scripts (count_tokens.py ...) + own meta.json + index.mdx
+```
+Parent `docs/content/docs/research/meta.json` lists each dossier under `pages`.
+
+**Two-part shape:**
+1. **Author the brief** (`prompt.mdx`) — the full self-contained spec: mission, constraints, operating rules, the exact chapter list (§10 of the brief), and the evidence bar (every external claim sourced, every local number method-stamped). This is the durable, reviewable artifact.
+2. **Execute the brief** — run it (typically via `goal`, see D26) to produce `index.mdx` + chapters + `tools/`, autonomously, without per-step questions.
 
 **Invocation:** `/jackin-dev:research <slug> [flags]`
 
 | Flag | Effect |
 |---|---|
-| `--web-only` | skip codebase exploration |
-| `--codebase-only` | skip the web pass |
-| `--question "<q>"` | focus the research on a specific question instead of the whole item |
+| `--brief-only` | author `prompt.mdx` (the spec) and stop; execute later via `goal` |
+| `--in-roadmap` | store findings **inline in the roadmap item** instead of a separate dossier (small research only) |
+| `--web-only` / `--codebase-only` | restrict gathering to one pass |
+
+**Storage decision (D25):**
+- **Default → separate dossier folder** under `docs/content/docs/research/<slug>/`.
+- **Inline in the roadmap item** only when the operator explicitly asks (`--in-roadmap` or "put it in the roadmap item"), and only for **small** research. Big research always gets its own folder.
 
 **Flow:**
-1. **Read the item** — load `docs/content/docs/reference/roadmap/<slug>.mdx`; extract Problem / Why / open questions.
-2. **Web pass** — call the built-in **`deep-research`** skill with the item's questions; collect cited findings (prior art, libraries per `ENGINEERING.md` crate-choice criteria, approaches other projects took).
-3. **Codebase pass** — explore how jackin' does the relevant thing today (Explore/grep; map related files, current behavior, constraints). Feeds `## Related Files`.
-4. **Fold in** — distribute findings into **Problem** (sharper statement), **Why It Matters** (evidence), and **Design** as *context/constraints only* (e.g. "crate X is the maintained choice", "current code path is `src/...`"). Do **not** write design decisions — that's `brainstorm`.
-5. **Cite** — keep source links inline so `brainstorm`/review can audit. (These are contributor-facing roadmap details; the item retires into docs on ship.)
-6. **Commit + push** — `docs:`; report what was added.
+1. **Scope** — from the topic/roadmap item, draft (or load) the brief `prompt.mdx`: mission, chapter list, evidence rules.
+2. **Gather** — web via built-in `deep-research`; codebase via Explore/grep. Every external claim carries a source URL; every local number carries its method.
+3. **Write** — `index.mdx` (headline numbers + how-to-read + tier list) and the numbered chapters in a fixed per-technique record schema; bundle any reproduction scripts under `tools/`.
+4. **Wire sidebar** — create/update the dossier `meta.json` and the parent `research/meta.json` (candidate `xtask research scaffold` / `research check`, D27).
+5. **Docs gate + commit** — run the `bun` docs gate; commit `docs(research):`; push.
 
-**Calls:** `deep-research` (web). **Does not** decide design or write `## Tasks`.
+**Calls:** `deep-research` (web) and, for execution, `goal`. **Does not** write code or design decisions.
+**xtask candidates:** `research scaffold <slug>` (create folder + meta.json + brief stub), `research check` (validate meta.json pages match files on disk).
 
 ### 10.4 `brainstorm` 🟢
 
@@ -325,7 +360,7 @@ Settled specs land here as we brainstorm each skill. Status 🟢 = agreed.
 1. **Load context** — read the item (Problem/Why/Design-so-far/Related Files) + any research already folded in.
 2. **Discuss freeform** — open back-and-forth: surface alternatives, trade-offs, open questions. No rigid script. Pull in jackin' design principles + relevant rule files (`ENGINEERING.md`, `HOST_AND_CONTAINER.md`, TUI/docs rules) as constraints.
 3. **Write incrementally** — as each point settles, append/update the matching part of **`## Design`** in the `.mdx` (decision + the one-line *why*). Resumable: a later `--resume` picks up where Design left off.
-4. **Hit an unknown?** — invoke `research --question "<q>"` to gather, then resume deciding.
+4. **Hit an unknown?** — gather quickly (Explore/grep, or `deep-research`); for a large investigation, spin a separate `research` dossier and link it from `## Design`. Then resume deciding.
 5. **Converge** — when Design covers the approach end-to-end, summarize and point at `/jackin-dev:plan <slug>` to break it into `## Tasks`.
 6. **Commit + push** — `docs:` per settled chunk (push-after-commit).
 
