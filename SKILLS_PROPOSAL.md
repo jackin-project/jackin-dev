@@ -172,6 +172,10 @@ Still open: Q4, Q5, Q6, Q8.
 - **D25** — Research **storage**: default = **separate dossier folder** `docs/content/docs/research/<slug>/`; **inline in the roadmap item only on explicit request** (`--in-roadmap`) and only for small research. Big research always gets its own folder.
 - **D26** — **`goal` is the universal spec-runner.** `/goal Follow <path>` (or `/goal Implement <path>`) executes any self-contained spec file end-to-end: a **roadmap item** → implement code; a **research brief** (`prompt.mdx`) → produce the dossier. Same skill, the spec decides the work. (The token-optimization brief documents its own run line as `/goal Follow token-optimization-research.md`.)
 - **D27** — Research sidebar wiring (`meta.json` per dossier + parent `research/meta.json`) is mechanical → **xtask candidates** `research scaffold <slug>` and `research check` (pages[] match files on disk).
+- **D28** — `merge-pr` **authorization**: invoking the skill is the per-PR go for normal PRs (proceed through the gates). **Pause for one explicit confirm only on high-blast-radius PRs** — schema-version bump, security/auth surface, CI/workflow changes, or anything needing a force-push / `--admin`.
+- **D29** — `merge-pr` **does the roadmap retirement** as a pre-merge action: if the PR ships the **last** piece of the item, run the 7-step retire-into-docs (move remaining content to canonical docs, delete the `.mdx`, update `roadmap/index.mdx`, sidebar/overview audits); if only **partial**, move `**Status**` to *Partially implemented* with remaining phases named. Feature/user docs themselves are written during implementation (`goal`); `merge-pr` owns the roadmap-item retirement specifically.
+- **D30** — `merge-pr` **polls CI until green**, then merges; stops if any check fails (no `--admin` bypass without explicit per-failure opt-in).
+- **D31** — `merge-pr` **trusts CI green** (`gh pr checks` all pass) as the gate; no local fmt/clippy/nextest re-run.
 - **D23** — Boundary: `research` **gathers** (may add design *context/constraints*); `brainstorm` **decides** (writes the actual design choices). `brainstorm` may invoke `research` mid-design when it hits an unknown.
 - **D24** — `research` is **optional and reorderable** in the feature pipeline; not every item needs it.
 
@@ -367,3 +371,28 @@ Parent `docs/content/docs/research/meta.json` lists each dossier under `pages`.
 **Boundary:** writes **decisions** (Design), not gathered evidence (that's `research`) and not the task breakdown (that's `plan`). Never writes source code.
 
 **xtask needed:** none beyond `change` helpers; both skills edit the `.mdx` directly and commit.
+
+### 10.5 `merge-pr` 🟢
+
+**Purpose:** run the jackin' pre-merge gate and squash-merge a PR, including roadmap-item retirement. Fail-closed; reuses `.github/` agent rules (it sequences them, doesn't restate them).
+
+**Invocation:** `/jackin-dev:merge-pr [<PR>] [flags]` (defaults to the PR for the current branch)
+
+| Flag | Effect |
+|---|---|
+| `--no-poll` | don't wait on pending CI; stop and report instead |
+| `--admin <check>` | authorize bypassing one named failing check (still requires the high-blast-radius confirm) |
+
+**Flow (fail-closed; STOP = halt + report):**
+1. **Resolve PR** — current branch's PR (or the arg). Read `gh pr view` + `gh pr diff`.
+2. **Blast-radius classify (D28)** — high if the diff touches a versioned schema, auth/security surface, `.github/workflows/**`, or needs force-push/`--admin`. High → **pause for one explicit confirm**; normal → proceed (invoking the skill is the go).
+3. **CI gate (D30/D31)** — `gh pr checks`: if pending, **poll until green** (unless `--no-poll`); if any **fail**, STOP (no `--admin` bypass unless `--admin <check>` + confirm). Trust CI; no local re-run.
+4. **Roadmap retirement (D29)** — does this PR ship the **last** piece of its roadmap item?
+   - **Yes** → run the 7-step retire-into-docs: move remaining operator detail to `guides/`/`commands/`, design detail to `reference/`, delete the roadmap `.mdx`, replace with a Completed bullet in `roadmap/index.mdx`, repoint inbound links, run sidebar + overview audits, run the `bun` docs gate. Commit `docs:`; push.
+   - **Partial** → set `**Status**: Partially implemented` with remaining phases named; sidebar/overview audits. Commit; push.
+   - candidate `xtask roadmap retire <slug>` / `roadmap audit` for the mechanical parts.
+5. **Metadata reconcile** — title/body match the final diff? Squash writes the title verbatim into history. Fix via `gh pr edit` if stale; surface the change in the reply.
+6. **Squash-merge** — build body file (prose summary, no checklists), append trailers via `cargo run -p jackin-pr-trailers -- --body-file`, then `gh pr merge <PR> --squash --body-file`. Title must carry `(#N)`.
+7. **Report** — merged SHA + what retirement did.
+
+**Bundles:** `jackin-pr-trailers`. **xtask candidates:** `roadmap retire`, `roadmap audit`.
