@@ -163,6 +163,10 @@ Still open: Q4, Q5, Q6, Q8.
 - **D14** — **Small fixes** (typo, dep bump, one-line fix, doc tweak) skip `propose` and use `create-pr` directly — no roadmap item.
 - **D15** — Research reuses the existing built-in **`deep-research`** skill (no new research skill); `propose`/`brainstorm` call it on demand (`--research`).
 - **D16** — Skills accept **arguments/flags** (e.g. `/jackin-dev:propose <idea> --auto-branch --no-pr`). Branch auto-naming is a per-call `--auto-branch` flag, not saved state.
+- **D17** — **No jackin' commit skill.** `COMMITS.md` auto-loads; commits are made inline by `create-pr` / `goal` following it. The generic `commit-commands` plugin remains available for a standalone `/commit`.
+- **D18** — PR body always uses the **full template, read from `.github/PULL_REQUEST_TEMPLATE.md` at runtime** — never embedded in a skill. Template change → skills follow automatically.
+- **D19** — PR mechanics live in a shared Rust helper **`cargo xtask pr body`** (reads the template, auto-selects verify-locally blocks from the diff). `propose` and `create-pr` both call it and open their own PR — **no skill calls another skill.**
+- **D20** — Implementation is the **`goal`** skill: `/goal Implement <slug>.md` builds a finalized roadmap item. Parked for later deep-design.
 
 ---
 
@@ -190,11 +194,15 @@ FEATURE / IDEA WORK
   propose            roadmap item draft + early PR  (NEVER codes; collects for the item, then stops)
     └► brainstorm    fill ## Design  (Socratic + optional deep-research)
         └► plan      fill ## Tasks
-            └► implement      separate step, a later session/skill
+            └► goal   implement a FINALIZED roadmap item  (e.g. /goal Implement <slug>.md)
                 └► merge-pr   retire the item into docs (the archive)
 
 SMALL FIX  (typo, dep bump, one-line fix, doc tweak)
-  create-pr          branch + commits + PR, no roadmap item
+  create-pr          branch + inline commit + PR, no roadmap item
+
+PR mechanics shared by propose + create-pr: `cargo xtask pr body`
+  reads .github/PULL_REQUEST_TEMPLATE.md + auto-selects verify-locally blocks from the diff.
+  No skill calls another skill — both call the helper and open their own PR.
 ```
 
 ## 9. Skill pipeline (revised from §4)
@@ -207,6 +215,7 @@ SMALL FIX  (typo, dep bump, one-line fix, doc tweak)
 | PR mechanics | `create-pr` | pure PR: variant classify, verify-block auto-select, 8-section body, heredoc `--body-file`, render self-check. The **small-fix path** (no roadmap item) and the PR-mechanics engine `propose` reuses. |
 | design | `brainstorm` | Socratic refinement + optional research → fills `## Design` (superpowers method) |
 | plan | `plan` | break `## Design` → `## Tasks` |
+| implement | `goal` | implement a **finalized** roadmap item: `/goal Implement <slug>.md`. Reads Problem/Why/Design/Tasks, builds it, updates docs. *(parked — deep-design later)* |
 | finish | `merge-pr` | verify, reconcile, retire roadmap item into docs, squash-merge |
 
 **Standalone skills** (unchanged, fire on their own intents): `review-pr`, `bump-schema`, `sync-docs`, `smoke-test`, `capsule-fixture`, `author-workflow`.
@@ -247,3 +256,25 @@ Settled specs land here as we brainstorm each skill. Status 🟢 = agreed.
 **xtask needed:** `change new`.
 
 **Open thread:** if you already have a roadmap-item skill whose behavior should carry over, point me at it; otherwise `propose` supersedes it.
+
+### 10.2 `create-pr` 🟢
+
+**Purpose:** open a PR for a **small fix** (no roadmap item), and serve as the shared PR-mechanics path. Commits inline; no separate commit skill.
+
+**Invocation:** `/jackin-dev:create-pr [flags]`
+
+| Flag | Effect |
+|---|---|
+| `--branch <name>` / `--auto-branch` | branch name explicit / self-chosen (same as `propose`) |
+| `--title <msg>` | commit + PR title override (else derived from the diff, Conventional Commits) |
+
+**Flow (state-checking, no "modes"):**
+1. **Branch** — if on `main`, create a `fix/`,`chore/`,`docs/`,`refactor/`-prefixed branch (suggest + confirm unless `--auto-branch`/`--branch`). Never commit to `main`.
+2. **Commit** — if there are uncommitted changes, commit them **inline** per `COMMITS.md` (Conventional Commits, DCO `-s`); if already committed, skip. Push.
+3. **Body** — `cargo xtask pr body` reads `.github/PULL_REQUEST_TEMPLATE.md` and auto-selects verify-locally blocks from the changed paths (Checkout + isolation always; Rust/Docs/User-smoke/capsule/schema conditional). Model fills the prose sections (Summary, What ships).
+4. **Create** — `gh pr create --body-file`; then render self-check (`gh pr view --json body`); fix `\`` / `\$` artifacts via `gh pr edit` if present.
+5. **Reply** — share URL + repeat the verify-locally commands.
+
+**xtask needed:** `pr body` (shared with `propose`).
+
+**Not for:** feature/idea work (use `propose`); implementation (use `goal`).
