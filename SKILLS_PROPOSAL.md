@@ -168,7 +168,7 @@ Still open: Q4, Q5, Q6, Q8.
 - **D19** — PR mechanics live in a shared Rust helper **`cargo xtask pr body`** (reads the template, auto-selects verify-locally blocks from the diff). `propose` and `create-pr` both call it and open their own PR — **no skill calls another skill.**
 - **D20** — Implementation is the **`goal`** skill: `/goal Implement <slug>.md` builds a finalized roadmap item. Parked for later deep-design.
 - **D21** — `brainstorm` runs as **freeform discussion** (not rigid Socratic), and writes decisions **incrementally into `## Design`** as each point settles (resumable across sessions).
-- **D22** — `research` covers **both web and codebase**, and **folds findings into the existing Problem / Why / Design sections** (no separate `## Research` section to later strip). It wraps the built-in `deep-research` for the web half.
+- **D22** — ~~`research` folds findings into Problem / Why / Design.~~ **REVERSED.** `research` produces a **standalone, free-form, multi-document brief** (not bound to the roadmap Problem/Why/Design shape), destined to be **published on the docs website**. Reference example: jackin PR #583 (`token-optimization-research.md` + `token-optimization-research/` directory of ~30 numbered chapters: executive summary, economics, baseline audit, prior-art scan, per-topic deep dives, composed stacks, validation harness, adoption roadmap). Final format/output-location TBD — operator finalizing a real example, then we spec. `research` still covers both web (`deep-research`) and codebase.
 - **D23** — Boundary: `research` **gathers** (may add design *context/constraints*); `brainstorm` **decides** (writes the actual design choices). `brainstorm` may invoke `research` mid-design when it hits an unknown.
 - **D24** — `research` is **optional and reorderable** in the feature pipeline; not every item needs it.
 
@@ -286,9 +286,11 @@ Settled specs land here as we brainstorm each skill. Status 🟢 = agreed.
 
 **Not for:** feature/idea work (use `propose`); implementation (use `goal`).
 
-### 10.3 `research` 🟢
+### 10.3 `research` 🟡 PARKED — awaiting operator's finalized example
 
-**Purpose:** enrich an **existing** roadmap item with gathered evidence — external prior art and the current jackin' codebase reality — folded into its Problem / Why / Design context. Gathers, never decides.
+> **Revised direction (supersedes the spec below).** `research` is a **heavyweight, free-form, multi-document deliverable**, not a roadmap-section enricher. It produces a standalone research brief (root summary `.md` + a directory of numbered chapters) destined for the **docs website**, like jackin PR #583. It does **not** force a Problem/Why/Design shape. The operator is finalizing a real research artifact and will share the final view; we spec format, output path, docs-site placement, and whether it attaches to a roadmap item *after* that. The flow below is retained only as raw notes on the web+codebase gathering mechanics.
+
+**Purpose (mechanics retained):** gather evidence — external prior art (`deep-research`) + current jackin' codebase reality — into a research brief. Gathers, never decides.
 
 **Invocation:** `/jackin-dev:research <slug> [flags]`
 
