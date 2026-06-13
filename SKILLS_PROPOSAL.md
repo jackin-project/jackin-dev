@@ -54,78 +54,32 @@ Home: the **`jackin-dev` plugin** (this repo), so the skills version with the to
 
 ---
 
-## 4. Candidate skills
+## 4. Final build set
 
-Priority = daily friction removed × how error-prone the manual path is.
+The build set is the **6 spec-driven pipeline + research skills**. The earlier broader candidate list (smoke-test, sync-docs, capsule-fixture, author-workflow, review) is **dropped** — those flows stay covered by the auto-loaded rule files and existing tooling (`/code-review`, `/verify`, `cargo xtask pty-fixture`, etc.).
 
-| # | Skill (gerund) | Trigger intent | Sequences / bundles | Freedom | Script? | Priority |
-|---|---|---|---|---|---|---|
-| S1 | `opening-jackin-prs` | "open a PR", "raise a PR for this" | body shape, verify-block selection, isolation env, capsule/docs-only branches, `--body-file` heredoc, repeat-verify reply | mixed | optional body-file builder | 🔥 highest |
-| S2 | `merging-jackin-prs` | "merge it", "ship this PR" | auth gate, CI-green, title/desc reconcile, roadmap re-check, squash `(#N)`, `jackin-pr-trailers` | low | uses `jackin-pr-trailers` | 🔥 highest |
-| S3 | `bumping-jackin-schema` | touch `AppConfig`/`WorkspaceConfig`/`RoleManifest`/`HooksConfig` | 5-artifact gate, one-bump-per-PR, fixture scaffold + re-bake, timeline entry | low | **yes** — `cargo xtask schema-check` | 🔥 high |
-| S5 | `smoke-testing-jackin` | "verify this PR locally", "walk me through testing" | `--debug` mandate, run-id triage, console-first + `the-architect`, capsule export, isolation dirs | low-med | no | med |
-| S6 | `syncing-jackin-docs` | "update docs", pre-merge docs gate | code↔docs cross-ref, three-audience split, roadmap status/retire, `bun` gate | med | optional cross-ref/audit script | med |
-| S7 | `recording-capsule-fixtures` | "record a PTY fixture", "capture render-conformance" | `--debug` run → `cargo xtask pty-fixture` → `include_bytes!` wiring | low | no (xtask is the script) | med-low |
-| S8 | `editing-jackin-ci` | touch `.github/workflows/**` | mise-only, job-level env, publish-gate-on-main, PR/main parity, smoke push-only jobs | med | optional parity linter | low-med |
+| Skill | Role | Spec |
+|---|---|---|
+| `propose` | open a feature/idea → roadmap item draft + early PR (never codes) | §10.1 🟢 |
+| `research` | standalone research dossier on the docs site (web + codebase) | §10.3 🟢 |
+| `brainstorm` | freeform design discussion → writes `## Design` | §10.4 🟢 |
+| `plan` | break `## Design` → `## Tasks` (light spec; not deep-dived) | §9 / TBD |
+| `create-pr` | small-fix PR + shared PR-mechanics (template + verify-block auto-select) | §10.2 🟢 |
+| `merge-pr` | pre-merge gate + roadmap retirement + squash-merge | §10.5 🟢 |
 
-Folded, not standalone (cover inside S1/S2 instead of separate skills): branch setup, commit hygiene — short, and the `commit-commands` plugin + `BRANCHING.md`/`COMMITS.md` already carry them. See open question Q4.
+External (referenced, not built here): `goal` (universal spec-runner), `deep-research` (built-in, called by `research`). Commits are inline per `COMMITS.md` — no commit skill.
 
----
-
-## 5. Full specs — S1–S4 (build targets)
-
-Each skill is a directory under `skills/<name>/`. `SKILL.md` body stays ≤500 lines; overflow → linked reference files one level deep.
-
-### S1 — `opening-jackin-prs`  🟡
-
-- **Description:** "Opens a pull request for the jackin' repository with the correct body shape, verify-locally blocks, and isolation env vars. Use when the user asks to open, create, or raise a PR for jackin'. Handles the capsule, docs-only, and schema-migration variants and builds the body with a heredoc body-file so GitHub renders it correctly."
-- **Freedom:** mixed — high for prose (Summary/What ships), low for the heredoc + isolation + capsule ordering.
-- **SKILL.md flow:**
-  1. **Pre-flight** — confirm on a feature branch (not `main`); if on `main`, propose a prefixed name and stop for confirmation (`BRANCHING.md`).
-  2. **Classify the change** — from changed paths, decide variant(s): touches `crates/jackin-capsule/` → capsule; `docs/**` only → docs-only; serializes into the 3 versioned files → schema-migration (hand off to S3 first).
-  3. **Select verify-locally blocks** — run the path→block matrix (reference file). Checkout + isolation env always; the rest conditional.
-  4. **Draft body** — 8 sections in order, drop optional ones per template comments; no hard-wrap, no deployed-docs links, no file-by-file changelog.
-  5. **Construct + create** — single-quoted `<<'EOF'` heredoc → `gh pr create --body-file`. Never escape backticks/`$`.
-  6. **Verify render** — `gh pr view <PR> --json body -q .body`; if `\`` or `\$` present, fix via `gh pr edit --body-file`.
-  7. **Reply** — share URL + repeat the verify-locally commands in the final message.
-- **Reference files:** `verify-block-selection.md` (path → block matrix + capsule `--capsule` ordering rule), `body-shape.md` (8 sections + anti-patterns).
-- **Scripts:** optional `build-body.sh` helper (writes heredoc to tmp, runs create, reads back render). Decide in follow-ups.
-- **Earns its keep:** the path→block selection and the capsule-ordering invariant are prose-only in the rules; the skill makes them a deterministic walk + a render self-check.
-
-### S2 — `merging-jackin-prs`  🟡
-
-- **Description:** "Runs the jackin' pre-merge gate and squash-merges a PR. Confirms explicit per-PR merge authorization, verifies CI is green via `gh pr checks`, reconciles the PR title and description against the diff, re-checks roadmap and docs freshness, then squash-merges with a `(#N)` title and deduped Signed-off-by / Co-authored-by trailers. Use only when the user explicitly authorizes merging a specific jackin' PR."
-- **Freedom:** low — exact commands, explicit STOP gates.
-- **SKILL.md flow (fail-closed):**
-  1. **Authorization gate** — require explicit "merge it / ship it" for *this* PR. Prior-session or sibling-PR authorization does NOT carry. Else stop and ask.
-  2. **CI gate** — `gh pr checks <PR>`; any non-`pass` → stop. No `--admin` bypass without per-failure operator opt-in.
-  3. **Freshness gate** — re-walk diff for roadmap/docs staleness; if stale, update + push before merging.
-  4. **Metadata reconcile** — `gh pr view` + `gh pr diff`; fix stale title/body via `gh pr edit` (squash writes title verbatim into history). Surface the change in the reply.
-  5. **Squash** — build body file (prose summary, no checklists), append trailers via `cargo run -p jackin-pr-trailers -- --body-file`, then `gh pr merge <PR> --squash --body-file`. Confirm title carries `(#N)`.
-- **Bundles:** `jackin-pr-trailers`.
-
-### S3 — `bumping-jackin-schema`  🟡  *(script-backed)*
-
-- **Description:** "Guides a versioned-schema change to jackin' config, per-workspace files, or the role manifest. Bumps exactly one `CURRENT_*_VERSION`, adds the migration step, scaffolds the new fixture directory, re-bakes every existing `after.toml`, and adds the schema-versions timeline entry. Use when a change touches `AppConfig`, `WorkspaceConfig`, `RoleManifest`, `HooksConfig`, or any type whose serde form lives in those three files."
-- **Freedom:** low — the five artifacts are a fixed sequence.
-- **SKILL.md flow:** identify file-kind → confirm single next-version bump (no gap/skip; rebase if `main` advanced) → add migration step in the right registry → scaffold `tests/fixtures/migrations/<kind>/from-<pred>/{meta,before,after}.toml` → re-bake all existing `after.toml` → add `schema-versions.mdx` timeline entry → run the validator → run fixture tests.
-- **Script (D2):** new `cargo xtask schema-check` (working name) — given the working tree / diff, asserts all five artifacts are present and consistent (version bumped, migration registered, fixture dir exists, every `from_version` re-baked, timeline entry added). Verbose, specific "missing X" errors. Wire the same subcommand into CI so PR-time and main-time enforce identically (PR/main parity rule). **This xtask is a prerequisite deliverable for S3.**
-
-### S5–S8 — parked (specs on request)
-Smoke-testing, docs/roadmap sync, capsule fixtures, CI authoring. To be specced after S1–S4 are agreed and once Q5/Q4 resolve.
+Full per-skill specs live in §10; the pipeline in §8–§9. Sections 5 (old gerund specs) removed as superseded.
 
 ---
 
 ## 6. Open questions
 
-1. **Scope priority** — Which skills first? Current plan: S1–S4. ✅ (see decisions)
-2. **Schema-migration script** — xtask vs shell. ✅ xtask (D2).
-3. **Review skill shape** — thin orchestrator vs standalone. ✅ thin (D3).
-4. **Branch/commit hygiene** — fold into S1, or a separate `starting-jackin-work` skill handling branch creation + naming + stay-on-active-branch at session start? — _open_
-5. **Smoke-test overlap** — standalone S5, or fold the `--debug`/run-id/capsule knowledge into S1's verify-locally section only? — _open_
-6. **Trigger style** — auto-fire on intent keywords (richer descriptions) vs explicit `/name` invocation? — _open_
-7. **Home** — ✅ `jackin-dev` plugin (D4).
-8. **Undocumented flows** — daily mental steps not written in the rule files that should become skills? — _open_
+All major scope questions resolved (see Decisions log). Remaining:
+
+- **Q-plan** — `plan` left at light spec (§9 row): break `## Design` → `## Tasks`. Deep-dive when we get to authoring it.
+- **Q-research-final** — `research` output format/placement matches jackin #583 dossier; confirm once the operator finalizes a second real example.
+- **Q-build-order** — which of the 6 to author first. Suggested: `create-pr` (smallest, shared mechanics) → `propose` → `merge-pr` → `brainstorm` → `research` → `plan`.
 
 ---
 
