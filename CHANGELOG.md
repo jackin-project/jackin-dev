@@ -10,4 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Spec-driven workflow skill set: `propose`, `brainstorm`, `research`, `create-pr`, `merge-pr` (manual-only; `disable-model-invocation`)
+- `SKILLS_PROPOSAL.md` design document for the workflow skill set
 - Initial release with three skills: `release-check`, `release-notes`, `release`
