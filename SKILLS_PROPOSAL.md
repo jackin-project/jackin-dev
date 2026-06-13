@@ -405,7 +405,13 @@ jackin' mounts credentials for **claude, codex, amp, kimi, opencode** — skills
 
 - **D33** — **One source of truth, many targets.** Author each skill once as `skills/<name>/SKILL.md` in portable SKILL.md format (required frontmatter `name` + `description`, markdown body, sidecar reference files). Keep any agent-specific behavior out of the body; distribute the same file to each agent's path.
 - **D34** — **Provide a native plugin where the agent has one.** Claude: `.claude-plugin/plugin.json` (have it). OpenCode: add an OpenCode plugin/config manifest. Codex / Amp / Kimi: no plugin system → deliver via the skills directory + an `AGENTS.md` pointer (jackin-dev already ships `.codex/INSTALL.md`; extend the same pattern to amp/kimi).
-- **D35** — **Distribution mechanism = a sync step, not hand-copying.** Prior art: `skills-supply` (`sk` + `agents.toml`) syncs one skill set to `~/.claude/skills`, `~/.codex/skills`, `~/.config/agents/skills`, `~/.config/opencode/skill`, etc. Options to decide (Q): (a) adopt `skills-supply`; (b) a small jackin' Rust sync (`cargo xtask skills sync`, consistent with D9/D11); (c) committed symlinks per agent. Lean (b) for self-containment + Rust-only preference, but (a) is zero-build.
+- **D35** — **Distribution = per-agent native plugin manifests + marketplaces, following the `obra/superpowers` model.** No custom sync binary. One `skills/<name>/SKILL.md` source of truth; ship an agent-specific manifest at repo root for each agent that has a plugin system, and let each agent install jackin-dev through its own channel:
+  - **claude** → `.claude-plugin/plugin.json` (have) → **`jackin-project/jackin-marketplace`** (already owned) → `/plugin install jackin-dev@jackin-marketplace`.
+  - **codex** → `.codex-plugin` manifest → Codex `/plugins` install (Codex now has a plugin/marketplace flow).
+  - **opencode** → `.opencode/` manifest + install instructions.
+  - **kimi** → skills marketplace / skills dir.
+  - **amp** → no plugin; AGENTS.md compat (reads `.claude/skills/`) + the `.codex/INSTALL.md`-style pointer.
+  Superpowers ships exactly this set (`.claude-plugin`, `.codex-plugin`, `.cursor-plugin`, `.opencode/`, `gemini-extension.json`) over one `skills/` tree; jackin-dev mirrors it for jackin's five agents (drop cursor/gemini). Supersedes the earlier custom-`xtask skills sync` idea.
 - **D36** — **Invocation is not identical across agents.** The manual `/jackin-dev:<name>` namespaced slash command is a Claude-plugin convention. On codex/amp/kimi/opencode the trigger may be the bare skill name or "read and follow `skills/<name>/SKILL.md`". The **manual-only rule (D8) still holds everywhere**; only the literal trigger string differs. Each SKILL.md description stays explicit-invocation-oriented so no agent auto-fires it.
 
 ### Authoring consequence
