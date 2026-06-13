@@ -384,3 +384,29 @@ Parent `docs/content/docs/research/meta.json` lists each dossier under `pages`.
 7. **Report** — merged SHA + what retirement did.
 
 **Bundles:** `jackin-pr-trailers`. **xtask candidates:** `roadmap retire`, `roadmap audit`.
+
+---
+
+## 11. Cross-agent packaging (all agents jackin' supports)
+
+jackin' mounts credentials for **claude, codex, amp, kimi, opencode** — skills must work on all five, not Claude only. Good news: **SKILL.md is a portable open standard** (agentskills.io) — every one of these agents reads the same `SKILL.md` format. Only the install path and plugin system differ.
+
+### Per-agent targets
+
+| Agent | Project skills dir | Native plugin system | jackin-dev delivery |
+|---|---|---|---|
+| **claude** (Claude Code) | `.claude/skills/` | **Yes** — `.claude-plugin/plugin.json` + marketplace | native plugin (already present) |
+| **opencode** | `.opencode/skill/` *(singular)* | **Yes** — `.opencode/plugin/` + `opencode.json` config | native plugin manifest + skills |
+| **amp** | `.agents/skills/` (also reads `.claude/skills/` for compat) | No | skills dir + `AGENTS.md` reference |
+| **codex** | `.codex/skills/` | No | skills dir (symlink) + `AGENTS.md` reference |
+| **kimi** (Kimi Code CLI) | project skills dir (Project>User>Extra>Built-in) | No | skills dir + MCP |
+
+### Decisions
+
+- **D33** — **One source of truth, many targets.** Author each skill once as `skills/<name>/SKILL.md` in portable SKILL.md format (required frontmatter `name` + `description`, markdown body, sidecar reference files). Keep any agent-specific behavior out of the body; distribute the same file to each agent's path.
+- **D34** — **Provide a native plugin where the agent has one.** Claude: `.claude-plugin/plugin.json` (have it). OpenCode: add an OpenCode plugin/config manifest. Codex / Amp / Kimi: no plugin system → deliver via the skills directory + an `AGENTS.md` pointer (jackin-dev already ships `.codex/INSTALL.md`; extend the same pattern to amp/kimi).
+- **D35** — **Distribution mechanism = a sync step, not hand-copying.** Prior art: `skills-supply` (`sk` + `agents.toml`) syncs one skill set to `~/.claude/skills`, `~/.codex/skills`, `~/.config/agents/skills`, `~/.config/opencode/skill`, etc. Options to decide (Q): (a) adopt `skills-supply`; (b) a small jackin' Rust sync (`cargo xtask skills sync`, consistent with D9/D11); (c) committed symlinks per agent. Lean (b) for self-containment + Rust-only preference, but (a) is zero-build.
+- **D36** — **Invocation is not identical across agents.** The manual `/jackin-dev:<name>` namespaced slash command is a Claude-plugin convention. On codex/amp/kimi/opencode the trigger may be the bare skill name or "read and follow `skills/<name>/SKILL.md`". The **manual-only rule (D8) still holds everywhere**; only the literal trigger string differs. Each SKILL.md description stays explicit-invocation-oriented so no agent auto-fires it.
+
+### Authoring consequence
+Write every skill to the **portable SKILL.md spec** (not Claude-only features): required `name`/`description` frontmatter, markdown body, reference files one level deep, forward-slash paths, Rust-binary scripts shelled out by path. Avoid Claude-plugin-only constructs in the skill body so the same file works unmodified on all five agents.
