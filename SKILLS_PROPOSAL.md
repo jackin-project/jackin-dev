@@ -167,6 +167,10 @@ Still open: Q4, Q5, Q6, Q8.
 - **D18** — PR body always uses the **full template, read from `.github/PULL_REQUEST_TEMPLATE.md` at runtime** — never embedded in a skill. Template change → skills follow automatically.
 - **D19** — PR mechanics live in a shared Rust helper **`cargo xtask pr body`** (reads the template, auto-selects verify-locally blocks from the diff). `propose` and `create-pr` both call it and open their own PR — **no skill calls another skill.**
 - **D20** — Implementation is the **`goal`** skill: `/goal Implement <slug>.md` builds a finalized roadmap item. Parked for later deep-design.
+- **D21** — `brainstorm` runs as **freeform discussion** (not rigid Socratic), and writes decisions **incrementally into `## Design`** as each point settles (resumable across sessions).
+- **D22** — `research` covers **both web and codebase**, and **folds findings into the existing Problem / Why / Design sections** (no separate `## Research` section to later strip). It wraps the built-in `deep-research` for the web half.
+- **D23** — Boundary: `research` **gathers** (may add design *context/constraints*); `brainstorm` **decides** (writes the actual design choices). `brainstorm` may invoke `research` mid-design when it hits an unknown.
+- **D24** — `research` is **optional and reorderable** in the feature pipeline; not every item needs it.
 
 ---
 
@@ -192,10 +196,12 @@ Lifecycle:
 ```
 FEATURE / IDEA WORK
   propose            roadmap item draft + early PR  (NEVER codes; collects for the item, then stops)
-    └► brainstorm    fill ## Design  (Socratic + optional deep-research)
-        └► plan      fill ## Tasks
-            └► goal   implement a FINALIZED roadmap item  (e.g. /goal Implement <slug>.md)
-                └► merge-pr   retire the item into docs (the archive)
+    └► research      (optional) web + codebase; folds findings into Problem/Why/Design context
+        └► brainstorm    freeform discussion; writes decisions incrementally into ## Design
+            └► plan      fill ## Tasks
+                └► goal   implement a FINALIZED roadmap item  (e.g. /goal Implement <slug>.md)
+                    └► merge-pr   retire the item into docs (the archive)
+  (research is optional + reorderable: brainstorm may call research mid-design when it hits an unknown)
 
 SMALL FIX  (typo, dep bump, one-line fix, doc tweak)
   create-pr          branch + inline commit + PR, no roadmap item
@@ -213,7 +219,8 @@ PR mechanics shared by propose + create-pr: `cargo xtask pr body`
 |---|---|---|
 | open | `propose` | **feature/idea only, never codes.** idea → branch → scaffold roadmap item draft (`xtask change new`) → open early PR via `create-pr`. Collects everything for the item, then stops. |
 | PR mechanics | `create-pr` | pure PR: variant classify, verify-block auto-select, 8-section body, heredoc `--body-file`, render self-check. The **small-fix path** (no roadmap item) and the PR-mechanics engine `propose` reuses. |
-| design | `brainstorm` | Socratic refinement + optional research → fills `## Design` (superpowers method) |
+| research | `research` | (optional) reads the item, runs web (`deep-research`) + codebase exploration, folds findings into Problem/Why/Design context. Gathers, never decides. |
+| design | `brainstorm` | freeform discussion; writes design decisions incrementally into `## Design`. May call `research` on an unknown. |
 | plan | `plan` | break `## Design` → `## Tasks` |
 | implement | `goal` | implement a **finalized** roadmap item: `/goal Implement <slug>.md`. Reads Problem/Why/Design/Tasks, builds it, updates docs. *(parked — deep-design later)* |
 | finish | `merge-pr` | verify, reconcile, retire roadmap item into docs, squash-merge |
@@ -278,3 +285,48 @@ Settled specs land here as we brainstorm each skill. Status 🟢 = agreed.
 **xtask needed:** `pr body` (shared with `propose`).
 
 **Not for:** feature/idea work (use `propose`); implementation (use `goal`).
+
+### 10.3 `research` 🟢
+
+**Purpose:** enrich an **existing** roadmap item with gathered evidence — external prior art and the current jackin' codebase reality — folded into its Problem / Why / Design context. Gathers, never decides.
+
+**Invocation:** `/jackin-dev:research <slug> [flags]`
+
+| Flag | Effect |
+|---|---|
+| `--web-only` | skip codebase exploration |
+| `--codebase-only` | skip the web pass |
+| `--question "<q>"` | focus the research on a specific question instead of the whole item |
+
+**Flow:**
+1. **Read the item** — load `docs/content/docs/reference/roadmap/<slug>.mdx`; extract Problem / Why / open questions.
+2. **Web pass** — call the built-in **`deep-research`** skill with the item's questions; collect cited findings (prior art, libraries per `ENGINEERING.md` crate-choice criteria, approaches other projects took).
+3. **Codebase pass** — explore how jackin' does the relevant thing today (Explore/grep; map related files, current behavior, constraints). Feeds `## Related Files`.
+4. **Fold in** — distribute findings into **Problem** (sharper statement), **Why It Matters** (evidence), and **Design** as *context/constraints only* (e.g. "crate X is the maintained choice", "current code path is `src/...`"). Do **not** write design decisions — that's `brainstorm`.
+5. **Cite** — keep source links inline so `brainstorm`/review can audit. (These are contributor-facing roadmap details; the item retires into docs on ship.)
+6. **Commit + push** — `docs:`; report what was added.
+
+**Calls:** `deep-research` (web). **Does not** decide design or write `## Tasks`.
+
+### 10.4 `brainstorm` 🟢
+
+**Purpose:** turn an item's intent + gathered research into concrete **design decisions** in `## Design`, through freeform discussion.
+
+**Invocation:** `/jackin-dev:brainstorm <slug> [flags]`
+
+| Flag | Effect |
+|---|---|
+| `--research` | run `research` first if the item looks thin |
+| `--resume` | continue from the current `## Design` state |
+
+**Flow:**
+1. **Load context** — read the item (Problem/Why/Design-so-far/Related Files) + any research already folded in.
+2. **Discuss freeform** — open back-and-forth: surface alternatives, trade-offs, open questions. No rigid script. Pull in jackin' design principles + relevant rule files (`ENGINEERING.md`, `HOST_AND_CONTAINER.md`, TUI/docs rules) as constraints.
+3. **Write incrementally** — as each point settles, append/update the matching part of **`## Design`** in the `.mdx` (decision + the one-line *why*). Resumable: a later `--resume` picks up where Design left off.
+4. **Hit an unknown?** — invoke `research --question "<q>"` to gather, then resume deciding.
+5. **Converge** — when Design covers the approach end-to-end, summarize and point at `/jackin-dev:plan <slug>` to break it into `## Tasks`.
+6. **Commit + push** — `docs:` per settled chunk (push-after-commit).
+
+**Boundary:** writes **decisions** (Design), not gathered evidence (that's `research`) and not the task breakdown (that's `plan`). Never writes source code.
+
+**xtask needed:** none beyond `change` helpers; both skills edit the `.mdx` directly and commit.
