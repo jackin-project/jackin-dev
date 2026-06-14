@@ -212,7 +212,7 @@ Settled specs land here as we brainstorm each skill. Status 🟢 = agreed.
 **Flow:**
 1. **Branch** — never commit to `main`. Derive `feature/<slug>` (or `fix/`,`refactor/`,`chore/` per change type) from the idea; suggest + confirm. Skip the confirm when `--auto-branch` or `--branch` given.
 2. **(optional) Research** — on `--research`, call `deep-research`; summarize findings into the draft.
-3. **Scaffold roadmap item** — `cargo xtask change new <slug>` creates `docs/content/docs/reference/roadmap/<slug>.mdx` with `**Status**: Open`, `## Problem`, `## Why It Matters`, empty `## Design`, `## Tasks`, `## Related Files`; adds the sidebar entry under Roadmap → Open items in `astro.config.ts`; runs the sidebar/overview audit. Fill Problem / Why It Matters from the idea text.
+3. **Scaffold roadmap item** — `cargo xtask change new <slug>` creates `docs/content/docs/reference/roadmap/<slug>.mdx` with `**Status**: Open`, `## Problem`, `## Why It Matters`, empty `## Design`, `## Tasks`, `## Related Files`; registers it in the chosen group's Fumadocs `meta.json`; `cargo xtask roadmap audit` validates the sidebar. Fill Problem / Why It Matters from the idea text.
 4. **Commit + push** — `docs:` type, DCO `-s`.
 5. **Open PR** — immediately, unless `--no-pr`, via `create-pr` mechanics. Summary = the idea; What ships = "roadmap item draft for `<slug>`"; Verify = docs render.
 6. **Stop.** Point the user at next steps: `/jackin-dev:brainstorm <slug>` to fill `## Design`.

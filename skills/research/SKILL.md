@@ -54,4 +54,4 @@ Also add `<slug>` to the parent `docs/content/docs/research/meta.json` `pages`. 
 
 ## Tooling
 
-`cargo xtask research scaffold <slug>` / `research check` (to be added in the jackin' repo) can create the folder + `meta.json` and validate `pages` against disk. Execution typically runs via the external `/goal Follow <brief>`.
+`cargo xtask research scaffold <slug>` creates the folder + `meta.json`; `cargo xtask research check` validates `pages` against disk. Execution typically runs via the external `/goal Follow <brief>`.

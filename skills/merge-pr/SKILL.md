@@ -48,4 +48,4 @@ Sequence the jackin' pre-merge gates **fail-closed**, retire the roadmap item in
 
 ## Tooling
 
-Bundles `jackin-pr-trailers` (exists). `cargo xtask roadmap retire <slug>` / `roadmap audit` (to be added) can mechanize the retirement steps; until then, do them directly.
+Bundles `jackin-pr-trailers` (exists). `cargo xtask roadmap audit` validates the sidebar after retirement. The content moves themselves are judgment — do them directly.
