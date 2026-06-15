@@ -82,9 +82,69 @@ The [`jackin-the-architect`](https://github.com/jackin-project/jackin-the-archit
 
 ## How it works
 
-- **Manual-only** is enforced with `disable-model-invocation: true` frontmatter, with the explicit-invocation `description` as the fallback for agents lacking that field.
-- **Mechanical steps shell out to `cargo xtask` subcommands** in the jackin' repo (CI reuses them → PR/main parity). Built: `change new`, `research scaffold`, `research check`, `roadmap audit`. Referenced but not yet built — the skills do these steps directly until they exist: `pr body`, `roadmap retire`, `schema-check`.
-- **Deferred:** the `plan` skill (break `## Design` → `## Tasks`).
+**Manual-only** is enforced with `disable-model-invocation: true` frontmatter, with the explicit-invocation `description` as the fallback for agents lacking that field.
+
+**Deferred:** the `plan` skill (break `## Design` → `## Tasks`).
+
+## How skills use `cargo xtask`
+
+The skills shell out to `cargo xtask` subcommands (they live in the jackin' repo and CI reuses them → PR/main parity) for the steps that are **mechanical, exact, or must-not-be-forgotten**. The division is deliberate:
+
+- **The binary** does the deterministic work — scaffold a file, edit sidebar JSON, classify a diff, emit the exact canonical text, run a validator — and hands the agent **facts + a correct skeleton**, then **verifies** the result. It never writes prose or makes a content decision.
+- **The agent** does the judgment — read the diff, decide what shipped, write the prose, decide where content moves.
+
+So the binary backstops what an agent slips on (a forgotten verify block, a dangling sidebar entry, a missing schema artifact, broken quoting), and the agent spends its effort on what only it can do.
+
+| Skill | `cargo xtask` used | Binary does (deterministic) | Agent does (judgment) |
+|---|---|---|---|
+| `propose` | `change new`, `roadmap audit` | scaffold the roadmap `.mdx` + register the sidebar entry; validate the sidebar | pick the group; write Problem / Why It Matters |
+| `brainstorm` | — | — | discuss; write `## Design` into the `.mdx` |
+| `research` | `research scaffold`, `research check` | create the dossier folder + `meta.json`; validate `pages` against disk | author the brief; write `index` + chapters |
+| `create-pr` | `pr body` | change digest + template with verify-locally blocks selected and byte-exact | write Summary / What ships / Behavior changes |
+| `merge-pr` | `roadmap retire --plan` / `--apply`, `roadmap audit` (+ CI `schema-check`) | worklist of inbound links + page content; remove the `meta.json` entry, delete the `.mdx`, run the audit, fail on a dangling link | move prose to `guides/`/`reference/`; write the `## Completed` bullet; repoint links |
+| `release-check` | — | — | review CI / test / exception results |
+| `release-notes` | — | — | classify merged PRs into changelog categories |
+| `release` | — | — | version recommendation; confirm; run `cargo release` |
+
+### `create-pr` flow
+
+```
+[agent]  branch → commit inline (Conventional Commits, DCO -s) → push
+[bin]    cargo xtask pr body --base origin/main
+           → classified change digest (rust/docs/capsule/schema + diffstat)
+           → PR template with the right verify-locally blocks filled byte-exact
+             (Checkout + isolation always; Rust/docs/capsule/schema conditional),
+             prose sections left as placeholders
+[agent]  fill the prose from the digest + diff
+[agent]  gh pr create --body-file  →  reply with URL + verify commands
+```
+
+`propose` reuses this `pr body` path for its early PR.
+
+### `merge-pr` flow
+
+```
+[agent]  resolve PR; read gh pr view + gh pr diff; blast-radius classify
+[bin]    CI gate — gh pr checks (CI already ran schema-check + tests); trust green
+   if the PR ships/advances a roadmap item:
+[bin]      cargo xtask roadmap retire <slug> --plan
+             → worklist: page content, every inbound link, the meta.json entry
+[agent]    move operator prose → guides/, design → reference/, write the
+           ## Completed bullet, repoint links; commit
+[bin]      cargo xtask roadmap retire <slug> --apply
+             → remove meta entry, delete .mdx, run audit, FAIL on dangling link
+   (partial ship → roadmap retire <slug> --partial sets Status, keeps the page)
+[agent]  metadata reconcile
+[bin]    squash-merge — jackin-pr-trailers + gh pr merge --squash (title carries (#N))
+```
+
+### `schema-check` — a CI gate, not a skill
+
+`cargo xtask schema-check --base origin/main` runs in `.github/workflows/ci.yml`. It detects a `CURRENT_*_VERSION` bump and fails the build unless all required artifacts ship (migration step, `from-<predecessor>/` fixture, `schema-versions.mdx` Timeline entry). No skill owns it — running in CI is what makes the 5-artifact rule enforced rather than reviewer-eyeballed. `merge-pr` only reads its result; the agent may run it locally during `/goal Implement` to self-check before pushing.
+
+### xtask inventory
+
+Built in the jackin' repo and used above: `change new`, `research scaffold`, `research check`, `roadmap audit`, `pr body`, `roadmap retire`, `schema-check`. Full reference: the xtask inventory page in the jackin' docs.
 
 ## Requirements
 

@@ -30,12 +30,7 @@ jackin' rule files auto-load — `PULL_REQUESTS.md`, `.github/` agent rules, `BR
 
 1. **Branch.** Never commit to `main`. If on `main`, create a `fix/` / `chore/` / `docs/` / `refactor/`-prefixed branch named from the change. Suggest and confirm unless `--auto-branch` or `--branch` given.
 2. **Commit.** Uncommitted changes → commit inline per `COMMITS.md`: Conventional Commits subject, DCO sign-off (`git commit -s`). Already committed → skip. Then `git push`.
-3. **Build the body.** Start from `.github/PULL_REQUEST_TEMPLATE.md` in the repo (read at runtime — never embed a copy). Fill prose sections. Auto-select Verify-locally blocks from changed paths:
-   - Checkout + isolation env vars (`JACKIN_CONFIG_DIR`, `JACKIN_HOME_DIR`) — **always**.
-   - Rust tests — when Rust sources changed.
-   - Docs checks + Documentation walk — when `docs/**` changed.
-   - jackin-capsule smoke + `--capsule` on the Checkout prepare — when `crates/jackin-capsule/` changed (the `--capsule` step must come before any `jackin console`/`load`).
-   - Schema migration smoke — when a versioned schema changed.
+3. **Build the body.** `[bin]` Run `cargo xtask pr body --base origin/main`. It prints a classified change digest (rust / docs / capsule / schema + diffstat) and the PR template — read from `.github/PULL_REQUEST_TEMPLATE.md` at runtime — with the verify-locally blocks already selected and byte-exact, prose left as placeholders. Block selection: Checkout + isolation env (`JACKIN_CONFIG_DIR`, `JACKIN_HOME_DIR`) always; Rust tests when Rust changed; Docs checks + walk when `docs/**` changed; jackin-capsule smoke with `--capsule` *before* any `console`/`load` when `crates/jackin-capsule/` changed; schema migration smoke when a versioned schema changed. `[agent]` Fill the prose sections (Summary, What ships, Behavior changes) from the digest + diff.
 4. **Create.** Write the body to a temp file with a single-quoted `<<'EOF'` heredoc (never escape backticks or `$`), then `gh pr create --body-file`.
 5. **Verify render.** `gh pr view <PR> --json body -q .body`. If you see `\`` or `\$`, the body is broken — fix with `gh pr edit --body-file`.
 6. **Reply.** Share the PR URL and repeat the Verify-locally commands in your final message.
@@ -50,4 +45,4 @@ jackin' rule files auto-load — `PULL_REQUESTS.md`, `.github/` agent rules, `BR
 
 ## Tooling
 
-`cargo xtask pr body` (to be added in the jackin' repo) can mechanize the template read + verify-block selection. Until then, do those steps directly.
+`cargo xtask pr body` (jackin' repo) emits the change digest + the template skeleton with verify-locally blocks auto-selected from the diff. Shared with `propose`. The binary guarantees the mechanical parts (block selection, capsule ordering, exact command text, heredoc quoting); the agent writes the prose.

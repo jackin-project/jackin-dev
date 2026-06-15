@@ -31,10 +31,10 @@ Sequence the jackin' pre-merge gates **fail-closed**, retire the roadmap item in
 
 1. **Resolve PR.** Current branch's PR or the arg. Read `gh pr view` and `gh pr diff`.
 2. **Blast-radius classify.** *High* if the diff touches a versioned schema, auth/security surface, `.github/workflows/**`, or needs a force-push / `--admin`. High → pause for one explicit confirm. Normal → proceed (invoking the skill is the go).
-3. **CI gate.** `gh pr checks <PR>`: if pending, **poll until green** (unless `--no-poll`); if any check fails, STOP. Trust CI — no local fmt/clippy/test re-run.
+3. **CI gate.** `gh pr checks <PR>`: if pending, **poll until green** (unless `--no-poll`); if any check fails, STOP. Trust CI — which runs `cargo xtask schema-check` plus the test/clippy/fmt jobs — no local re-run.
 4. **Roadmap retirement.** Does this PR ship the **last** piece of its roadmap item?
-   - **Yes** → run the 7-step retire-into-docs: move remaining operator detail to `guides/`/`commands/`, design detail to `reference/`, delete the roadmap `.mdx`, replace with a Completed bullet in `roadmap/index.mdx`, repoint inbound links, run sidebar + overview audits, run the `bun` docs gate. Commit `docs:`; push.
-   - **Partial** → set `**Status**: Partially implemented` with remaining phases named; sidebar/overview audits. Commit; push.
+   - **Yes** → `[bin]` `cargo xtask roadmap retire <slug> --plan` prints the worklist: the page content, every inbound link (`grep <slug>`), and the `meta.json` entry. `[agent]` Do the judgment moves — operator detail → `guides/`/`commands/`, design detail → `reference/`, write the `## Completed` bullet in `roadmap/index.mdx`, repoint inbound links; commit `docs:`. `[bin]` `cargo xtask roadmap retire <slug> --apply` removes the `meta.json` entry, deletes the `.mdx`, runs the audit, and **fails if any inbound link still points at the dead slug**. Run the `bun` docs gate; push.
+   - **Partial** → `cargo xtask roadmap retire <slug> --partial` sets `**Status**: Partially implemented` and keeps the page; name the remaining phases; commit; push.
 5. **Metadata reconcile.** Title/body match the final diff? Squash writes the title verbatim into history. Fix via `gh pr edit` if stale; surface the change in your reply.
 6. **Squash-merge.** Build a body file (prose summary, no checklists), append trailers via `cargo run -p jackin-pr-trailers -- --body-file`, then `gh pr merge <PR> --squash --body-file`. Confirm the title carries `(#N)`.
 7. **Report.** Merged SHA and what retirement did.
@@ -48,4 +48,4 @@ Sequence the jackin' pre-merge gates **fail-closed**, retire the roadmap item in
 
 ## Tooling
 
-Bundles `jackin-pr-trailers` (exists). `cargo xtask roadmap audit` validates the sidebar after retirement. The content moves themselves are judgment — do them directly.
+Bundles `jackin-pr-trailers`. `cargo xtask roadmap retire <slug> --plan` gives the agent the retirement worklist; `--apply` does the mechanical removal + audit and fails on a dangling link; `--partial` sets the Status. The content moves themselves are the agent's judgment. CI runs `cargo xtask schema-check` (the 5-artifact gate); this skill only reads its result.
