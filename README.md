@@ -16,7 +16,7 @@ All skills are **manual-only** — invoke each explicitly as `/jackin-dev:<name>
 | `create-pr` | Open a small-fix PR with the correct body + auto-selected verify blocks |
 | `merge-pr` | Pre-merge gate + roadmap retirement + squash-merge |
 
-The feature path is `propose → brainstorm → /goal Implement <slug>.md → merge-pr`. Small fixes use `create-pr → merge-pr`. See [SKILLS_PROPOSAL.md](SKILLS_PROPOSAL.md) for the full design.
+The feature path is `propose → brainstorm → /goal Implement <slug>.md → merge-pr`. Small fixes use `create-pr → merge-pr`. See [DESIGN.md](DESIGN.md) for the architecture and decisions.
 
 ### Release
 
