@@ -1,6 +1,7 @@
 ---
 name: release
 description: Use when performing a release, cutting a new version, or running the full release process for the jackin project
+argument-hint: "[major|minor|patch|version]"
 ---
 
 # Release

@@ -1,6 +1,7 @@
 ---
 name: create-pr
 description: Opens a pull request for a small jackin' change with the correct body shape and auto-selected verify-locally blocks. Use when the operator runs /jackin-dev:create-pr.
+argument-hint: "[--branch <name>|--auto-branch] [--title <msg>]"
 disable-model-invocation: true
 ---
 
