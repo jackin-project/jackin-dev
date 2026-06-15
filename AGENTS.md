@@ -1,32 +1,17 @@
 # AGENTS.md
 
-This is a Claude Code plugin providing development workflow skills for the [jackin](https://github.com/jackin-project/jackin) project.
+A plugin providing development workflow skills for the [jackin](https://github.com/jackin-project/jackin) project.
 
-## Available Skills
+All skills are **manual-only** — the operator invokes each explicitly as `/jackin-dev:<name>`. None auto-fire (each `SKILL.md` sets `disable-model-invocation: true`).
 
-### release-check
+## Skills
 
-Use when preparing for a release or verifying release readiness.
+Eight manual-only skills live under `skills/`: `propose`, `brainstorm`, `research`, `create-pr`, `merge-pr` (feature workflow) and `release-check`, `release-notes`, `release`.
 
-Runs pre-release validation checks: CI status, local tests, clippy, fmt, doc link validation, TODO freshness, security exceptions review, and Docker build status.
+- **What each does, the workflow model, and the design** — see [README.md](README.md).
+- **The full process for one skill** — see its `skills/<name>/SKILL.md`.
 
-Skill definition: `skills/release-check/SKILL.md`
-
-### release-notes
-
-Use when generating or updating the changelog, preparing release notes, or populating the Unreleased section of CHANGELOG.md.
-
-Generates the `[Unreleased]` section of `CHANGELOG.md` from merged PRs since the last tag, classified into Keep a Changelog categories.
-
-Skill definition: `skills/release-notes/SKILL.md`
-
-### release
-
-Use when performing a release, cutting a new version, or running the full release process.
-
-Orchestrates the full release flow: runs release-check, generates release notes, recommends version, gets user confirmation, then runs `cargo release`.
-
-Skill definition: `skills/release/SKILL.md`
+Invoke explicitly as `/jackin-dev:<name>`; nothing auto-fires.
 
 ## Requirements
 

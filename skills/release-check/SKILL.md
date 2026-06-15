@@ -90,7 +90,7 @@ If there are commits not associated with any PR, report **WARN** with the list. 
 
 ### Check 6: Doc Link Validation
 
-Check for broken internal links in `docs/src/content/docs/`:
+Check for broken internal links in `docs/content/docs/`:
 
 - Read markdown files and extract internal links (relative paths, `href` attributes)
 - Verify each linked file exists
