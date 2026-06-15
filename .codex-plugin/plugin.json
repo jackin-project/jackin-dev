@@ -5,8 +5,8 @@
   "author": {
     "name": "Alexey Zhokhov"
   },
-  "homepage": "https://github.com/donbeave/jackin-dev",
-  "repository": "https://github.com/donbeave/jackin-dev",
+  "homepage": "https://github.com/jackin-project/jackin-dev",
+  "repository": "https://github.com/jackin-project/jackin-dev",
   "license": "Apache-2.0",
   "keywords": [
     "release",
