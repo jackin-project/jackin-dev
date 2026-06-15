@@ -11,6 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 - Spec-driven workflow skill set: `propose`, `brainstorm`, `research`, `create-pr`, `merge-pr` (manual-only; `disable-model-invocation`)
-- Cross-agent packaging: `.codex-plugin/plugin.json`, `.opencode/INSTALL.md`, refreshed `.codex/INSTALL.md`, README install docs for Claude Code, Codex, OpenCode, Amp, and Kimi
-- `WORKFLOW.md` design and decisions reference for the workflow skill set
+- Cross-agent packaging: `.codex-plugin/plugin.json` and README install docs for Claude Code, Codex, Amp, OpenCode, and Kimi (the four non-Claude agents all read `~/.agents/skills/`)
+- README expanded into the canonical reference: workflow model, per-skill detail, cross-agent install, and design notes
 - Initial release with three skills: `release-check`, `release-notes`, `release`
