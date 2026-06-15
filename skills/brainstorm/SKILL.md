@@ -1,6 +1,7 @@
 ---
 name: brainstorm
 description: Turns a jackin' roadmap item's intent into concrete design decisions through freeform discussion, written into its Design section. Use when the operator runs /jackin-dev:brainstorm.
+argument-hint: "<slug> [--research] [--resume]"
 disable-model-invocation: true
 ---
 

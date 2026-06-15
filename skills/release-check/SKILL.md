@@ -1,6 +1,7 @@
 ---
 name: release-check
 description: Use when preparing for a release, verifying release readiness, or running pre-release checks on the jackin project
+argument-hint: "[context]"
 ---
 
 # Release Check

@@ -1,6 +1,7 @@
 ---
 name: research
 description: Produces a standalone multi-page research dossier on the jackin' docs site from a brief, drawing on web and codebase evidence. Use when the operator runs /jackin-dev:research.
+argument-hint: "<slug> [--brief-only] [--in-roadmap] [--web-only|--codebase-only]"
 disable-model-invocation: true
 ---
 

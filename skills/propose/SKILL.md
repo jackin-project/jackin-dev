@@ -1,6 +1,7 @@
 ---
 name: propose
 description: Opens a new jackin' feature or idea as a roadmap item draft plus an early pull request, without writing any code. Use when the operator runs /jackin-dev:propose.
+argument-hint: "<idea> [--branch <name>|--auto-branch] [--no-pr] [--research]"
 disable-model-invocation: true
 ---
 

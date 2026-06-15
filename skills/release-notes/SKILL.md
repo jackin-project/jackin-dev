@@ -1,6 +1,7 @@
 ---
 name: release-notes
 description: Use when generating or updating the changelog, preparing release notes, or populating the Unreleased section of CHANGELOG.md for the jackin project
+argument-hint: "[context]"
 ---
 
 # Release Notes

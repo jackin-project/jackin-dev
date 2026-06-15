@@ -1,6 +1,7 @@
 ---
 name: merge-pr
 description: Runs the jackin' pre-merge gate, retires the roadmap item into docs, and squash-merges a pull request. Use when the operator runs /jackin-dev:merge-pr.
+argument-hint: "[PR] [--no-poll] [--admin <check>]"
 disable-model-invocation: true
 ---
 
