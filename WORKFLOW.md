@@ -1,4 +1,4 @@
-# jackin-dev workflow design
+# jackin-dev workflow
 
 How the spec-driven workflow skills are structured and why. Stable reference — the per-skill behavior lives in each `skills/<name>/SKILL.md`; this file records the architecture and the decisions behind it.
 
