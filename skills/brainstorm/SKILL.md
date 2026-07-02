@@ -28,7 +28,7 @@ Judgment task — describe and decide; do not script it, do not write code, do n
 
 ## Process
 
-1. **Load context.** Read `docs/content/docs/reference/roadmap/<slug>.mdx` — Problem, Why It Matters, Design-so-far, Related Files — plus any research already linked.
+1. **Load context.** Read `docs/content/docs/roadmap/<slug>.mdx` — Problem, Why It Matters, Design-so-far, Related Files — plus any research already linked.
 2. **Discuss freeform.** Open back-and-forth: surface alternatives, trade-offs, open questions. Pull in jackin' design principles and the relevant rule files (`ENGINEERING.md`, `HOST_AND_CONTAINER.md`, TUI/docs rules) as constraints. Prefer one question at a time; check in as each part settles.
 3. **Write incrementally.** As each point settles, append or update the matching part of `## Design` in the `.mdx` — the decision plus a one-line *why*. `--resume` picks up from there.
 4. **Hit an unknown?** Gather quickly (Explore/grep, or `deep-research`). Large investigation → spin a separate `/jackin-dev:research` dossier and link it from `## Design`. Then resume deciding.

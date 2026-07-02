@@ -31,7 +31,7 @@ jackin' rule files auto-load — `BRANCHING.md`, `COMMITS.md`, `PULL_REQUESTS.md
 
 1. **Branch.** Never commit to `main`. Derive a `feature/<slug>` name (or `fix/` / `refactor/` / `chore/` per change type) from the idea; suggest and confirm unless `--auto-branch` / `--branch` given.
 2. **(optional) Research.** On `--research`, run the built-in `deep-research` skill and summarize findings into the draft. For large research, prefer `/jackin-dev:research`.
-3. **Scaffold the roadmap item.** Run `cargo xtask change new <slug> --group <group>` — it creates `docs/content/docs/reference/roadmap/<slug>.mdx` (`**Status**: Open`, `## Problem`, `## Why It Matters`, `## Design`, `## Tasks`, `## Related Files`) and registers it in the chosen group's Fumadocs `meta.json`. Pick the `--group` from the existing roadmap groups. Then fill Problem / Why It Matters from the idea text, and run `cargo xtask roadmap audit`.
+3. **Scaffold the roadmap item.** Run `cargo xtask change new <slug> --group <group>` — it creates `docs/content/docs/roadmap/<slug>.mdx` (`**Status**: Open`, `## Problem`, `## Why It Matters`, `## Design`, `## Tasks`, `## Related Files`) and registers it in the chosen group's Fumadocs `meta.json`. Pick the `--group` from the existing roadmap groups. Then fill Problem / Why It Matters from the idea text, and run `cargo xtask roadmap audit`.
 4. **Commit + push.** `docs:` type, DCO `-s`, then `git push`.
 5. **Open the PR.** Unless `--no-pr`, build and open the PR with `create-pr` mechanics — Summary = the idea, What ships = "roadmap item draft for `<slug>`", Verify = docs render.
 6. **Stop.** Point the operator at the next step: `/jackin-dev:brainstorm <slug>` to fill `## Design`. Do not implement.

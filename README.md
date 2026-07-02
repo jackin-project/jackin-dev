@@ -29,7 +29,7 @@ SMALL FIX
 ## Feature skills
 
 ### `propose`
-Open a feature/idea as a tracked **roadmap item + early PR**. Scaffolds `reference/roadmap/<slug>.mdx` (`Problem` / `Why It Matters` / `Design` / `Tasks` / `Related Files`) + its sidebar entry, fills Problem/Why from the idea, opens the PR, and **stops** — it never writes code or fills `Design`/`Tasks`.
+Open a feature/idea as a tracked **roadmap item + early PR**. Scaffolds `roadmap/<slug>.mdx` (`Problem` / `Why It Matters` / `Design` / `Tasks` / `Related Files`) + its sidebar entry, fills Problem/Why from the idea, opens the PR, and **stops** — it never writes code or fills `Design`/`Tasks`.
 *Flags:* `--branch <name>` / `--auto-branch`, `--no-pr`, `--research`. *Not for:* small fixes (→ `create-pr`).
 
 ### `brainstorm`
