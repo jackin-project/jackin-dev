@@ -1,6 +1,6 @@
 ---
 name: jackin-brainstorm
-description: Turns a jackin❯ roadmap item's intent into concrete design decisions through freeform discussion, written into its Design section. Use when the operator runs /jackin-dev:jackin-brainstorm.
+description: Turns a jackin❯ roadmap item's intent into concrete design decisions through freeform discussion, written into its Design section. Use when the operator wants to shape an open roadmap item's design before implementation.
 argument-hint: "<slug> [--research] [--resume]"
 disable-model-invocation: true
 ---
@@ -13,17 +13,17 @@ Judgment task — describe and decide; do not script it, do not write code, do n
 
 ## When to use
 
-- Operator runs `/jackin-dev:jackin-brainstorm <slug>` to design an open roadmap item.
+- Operator runs `jackin-brainstorm <slug>` to design an open roadmap item.
 
 ## When NOT to use
 
-- Creating the item → `/jackin-dev:jackin-propose`.
-- Large external/codebase investigation → `/jackin-dev:jackin-research`.
+- Creating the item → `jackin-propose`.
+- Large external/codebase investigation → `jackin-research`.
 - Implementing → `/goal Implement <slug>.md`.
 
 ## Arguments
 
-- `--research` — run `/jackin-dev:jackin-research` first if the item looks thin.
+- `--research` — run `jackin-research` first if the item looks thin.
 - `--resume` — continue from the current `## Design` state.
 
 ## Process
@@ -31,7 +31,7 @@ Judgment task — describe and decide; do not script it, do not write code, do n
 1. **Load context.** Read `docs/content/docs/roadmap/<slug>.mdx` — Problem, Why It Matters, Design-so-far, Related Files — plus any research already linked.
 2. **Discuss freeform.** Open back-and-forth: surface alternatives, trade-offs, open questions. Pull in jackin❯ design principles and the relevant rule files (`ENGINEERING.md`, `HOST_AND_CONTAINER.md`, TUI/docs rules) as constraints. Prefer one question at a time; check in as each part settles.
 3. **Write incrementally.** As each point settles, append or update the matching part of `## Design` in the `.mdx` — the decision plus a one-line *why*. `--resume` picks up from there.
-4. **Hit an unknown?** Gather quickly (Explore/grep, or `deep-research`). Large investigation → spin a separate `/jackin-dev:jackin-research` dossier and link it from `## Design`. Then resume deciding.
+4. **Hit an unknown?** Gather quickly (Explore/grep, or `deep-research`). Large investigation → spin a separate `jackin-research` dossier and link it from `## Design`. Then resume deciding.
 5. **Converge.** When `## Design` covers the approach end to end, summarize and point at the implementation step (`/goal Implement <slug>.md`).
 6. **Commit + push.** `docs:` per settled chunk (push after every commit).
 

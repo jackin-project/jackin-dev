@@ -2,7 +2,7 @@
 
 A plugin providing development workflow skills for the [jackin](https://github.com/jackin-project/jackin) project.
 
-All skills are **manual-only** — the operator invokes each explicitly as `/jackin-dev:jackin-<name>`. None auto-fire (each `SKILL.md` sets `disable-model-invocation: true`).
+All skills are **manual-only in Claude Code** — each `SKILL.md` sets `disable-model-invocation: true`. That flag is a Claude Code extension; OpenCode and Codex ignore it and may auto-invoke from the `description`. Invocation syntax is per-agent (see the README's [Invocation](README.md#invocation) table).
 
 ## Skills
 
@@ -11,7 +11,7 @@ Eight manual-only skills live under `skills/`: `jackin-propose`, `jackin-brainst
 - **What each does, the workflow model, and the design** — see [README.md](README.md).
 - **The full process for one skill** — see its `skills/<name>/SKILL.md`.
 
-Invoke explicitly as `/jackin-dev:jackin-<name>`; nothing auto-fires.
+Invoke by the skill name `jackin-<name>`; the exact syntax is per-agent — Claude Code plugin: `/jackin-dev:jackin-<name>`, Codex: `$jackin-<name>`, Grok: `/jackin-<name>`, OpenCode/Amp/Kimi auto-invoke. See the README's Invocation table.
 
 ## Requirements
 

@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [0.3.0] - 2026-07-04
 
 ### Changed
-- **BREAKING:** prefixed every skill with `jackin-` (`propose` → `jackin-propose`, …, `release` → `jackin-release`) so they no longer collide in the shared `~/.agents/skills/` tree. Invocations are now `/jackin-dev:jackin-<name>`.
+- **BREAKING:** prefixed every skill with `jackin-` (`propose` → `jackin-propose`, …, `release` → `jackin-release`) so they no longer collide in the shared `~/.agents/skills/` tree. Skill names are now `jackin-<name>` everywhere.
+- Made `SKILL.md` descriptions agent-neutral triggers (per the [agentskills.io](https://agentskills.io/specification) spec: describe what + when, not how to invoke). Dropped the Claude-Code-only `/jackin-dev:` syntax from descriptions and bodies; the README now documents per-agent invocation.
 - Rebranded the stylized project mark `jackin'` → `jackin❯` across docs.
 - README install section now uses each agent's native CLI where one exists (`claude plugin`, `codex plugin`, `amp skill add`, `grok plugin install`); OpenCode and Kimi Code fall back to the `skills` CLI. All six verified locally.
 

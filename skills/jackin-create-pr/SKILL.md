@@ -1,6 +1,6 @@
 ---
 name: jackin-create-pr
-description: Opens a pull request for a small jackin❯ change with the correct body shape and auto-selected verify-locally blocks. Use when the operator runs /jackin-dev:jackin-create-pr.
+description: Opens a pull request for a small jackin❯ change with the correct body shape and auto-selected verify-locally blocks. Use when shipping a small fix (typo, dependency bump, one-line bugfix, doc tweak) that needs no roadmap item.
 argument-hint: "[--branch <name>|--auto-branch] [--title <msg>]"
 disable-model-invocation: true
 ---
@@ -13,12 +13,12 @@ jackin❯ rule files auto-load — `PULL_REQUESTS.md`, `.github/` agent rules, `
 
 ## When to use
 
-- Operator runs `/jackin-dev:jackin-create-pr`.
+- Operator runs `jackin-create-pr`.
 - Small, self-contained change (no design, no roadmap item).
 
 ## When NOT to use
 
-- Feature/idea worth a roadmap item → `/jackin-dev:jackin-propose`.
+- Feature/idea worth a roadmap item → `jackin-propose`.
 - Implementing a finalized roadmap item → `/goal Implement <slug>.md`.
 
 ## Arguments

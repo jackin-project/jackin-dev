@@ -4,7 +4,22 @@ Development workflow plugin for the [jackin](https://github.com/jackin-project/j
 
 **Skills are the orchestration layer; the jackin❯ repo's rule files stay the source of truth.** Each skill sequences steps that are otherwise scattered across the repo's auto-loaded topic files (`PULL_REQUESTS.md`, `BRANCHING.md`, `COMMITS.md`, `PRERELEASE.md`, …) and names the governing rule instead of copying it — so when a rule changes, the skill keeps pointing at it. The full behavior of each skill lives in its `skills/<name>/SKILL.md`; this README is the map.
 
-All skills are **manual-only** — invoke each explicitly as `/jackin-dev:jackin-<name>`; none auto-fire (each sets `disable-model-invocation: true`).
+All skills are **manual-only in Claude Code** — each sets `disable-model-invocation: true`. That flag is a Claude Code extension; OpenCode and Codex ignore it and auto-invoke from the `description`. Invocation syntax is per-agent — see [Invocation](#invocation).
+
+## Invocation
+
+The skill **name** (`jackin-<name>`) is the portable identifier across every agent; each agent spells the trigger differently. Skills are global, so most agents invoke them by bare name (no `jackin-dev:` namespace — that's Claude-Code-plugin-only).
+
+| Agent | How to run `jackin-<name>` |
+|---|---|
+| Claude Code (plugin install) | `/jackin-dev:jackin-<name>` |
+| Claude Code (`~/.claude/skills/`) | `/jackin-<name>` |
+| Codex | `$jackin-<name>` (or `/skills` to list/pick) |
+| Grok | `/jackin-<name>` |
+| OpenCode | auto-invoked by the agent via the `skill` tool (from the `description`) |
+| Amp · Kimi Code | auto-invoked by the agent (from the `description`) |
+
+`disable-model-invocation: true` keeps these manual-only in Claude Code. Codex's equivalent is `allow_implicit_invocation: false` in `agents/openai.yaml`; OpenCode has no per-skill opt-out (govern via `permission.skill` in `opencode.json`).
 
 ## Workflow
 
