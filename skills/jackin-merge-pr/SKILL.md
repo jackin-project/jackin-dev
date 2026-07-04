@@ -1,6 +1,6 @@
 ---
 name: jackin-merge-pr
-description: Runs the jackin❯ pre-merge gate, retires the roadmap item into docs, and squash-merges a pull request. Use when a jackin❯ pull request is ready to merge through the pre-merge gate.
+description: Runs the jackin❯ pre-merge gate, retires the roadmap item into docs, and squash-merges a pull request.
 argument-hint: "[PR] [--no-poll] [--admin <check>]"
 disable-model-invocation: true
 ---

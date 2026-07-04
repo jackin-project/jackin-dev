@@ -1,6 +1,6 @@
 ---
 name: jackin-research
-description: Produces a standalone multi-page research dossier on the jackin❯ docs site from a brief, drawing on web and codebase evidence. Use when a substantial investigation needs a standalone, sourced dossier.
+description: Produces a standalone multi-page research dossier on the jackin❯ docs site, drawing on web and codebase evidence.
 argument-hint: "<slug> [--brief-only] [--in-roadmap] [--web-only|--codebase-only]"
 disable-model-invocation: true
 ---

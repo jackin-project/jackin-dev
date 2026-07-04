@@ -1,144 +1,61 @@
 ---
 name: jackin-release
-description: Use when performing a release, cutting a new version, or running the full release process for the jackin project
+description: Cuts a jackin❯ release — runs the readiness gates, writes the changelog, recommends a version, then executes cargo release on explicit operator confirmation.
 argument-hint: "[major|minor|patch|version]"
 disable-model-invocation: true
 ---
 
 # jackin-release
 
-Full release orchestrator for the jackin project. Runs pre-release validation, generates changelog, recommends version, and executes `cargo release`.
+**Cut** a release. The only irreversible skill in the suite — `cargo release --execute` bumps the version, rewrites the changelog header, tags, and pushes. Hard-gated on one explicit operator "yes"; nothing releases on assumption.
 
-## When to Use
+Orchestrates `jackin-release-check` (the gates) and `jackin-release-notes` (the changelog), then recommends a version from the changelog shape and cuts.
 
-- When you want to cut a new release
-- When asked to "release", "cut a version", or "ship it"
+## When to use
 
-## When NOT to Use
+- The operator asks to cut / ship / release a version.
 
-- If you just want to check readiness: use `release-check` instead
-- If you just want to update the changelog: use `release-notes` instead
+## When NOT to use
+
+- Just checking readiness → `jackin-release-check`.
+- Just updating the changelog → `jackin-release-notes`.
 
 ## Prerequisites
 
-- `cargo-release` must be installed: `cargo install cargo-release`
-- `gh` CLI must be authenticated: `gh auth status`
-- `release.toml` must have `pre-release-replacements` configured for CHANGELOG.md
-- `CHANGELOG.md` must exist with `<!-- next-header -->` marker
-- `.github/workflows/ci.yml` must exist
+`cargo-release` installed; `gh` authenticated; `release.toml` with `pre-release-replacements` for `CHANGELOG.md`; `CHANGELOG.md` with the `<!-- next-header -->` marker; `.github/workflows/ci.yml`.
 
 ## Process
 
-### Step 1: Run Release Check
+1. **Gates.** Run `jackin-release-check`. A red gate **stops** — show the report and name what to fix. Warns surface; ask whether to continue.
 
-Follow the `release-check` skill completely. Read `skills/release-check/SKILL.md` and execute all checks.
+   *Done when* every gate is green, or the operator accepted the warns.
 
-If any **blocking** check fails, **STOP**. Show the readiness report and tell the user what needs to be fixed. Do not proceed.
+2. **Changelog.** Run `jackin-release-notes`. Present the `[Unreleased]` section; let the operator re-classify or reword.
 
-If only **warnings** or **review items** exist, show the report and ask: "Warnings found. Continue with release? (yes/no)"
+   *Done when* the operator approves the changelog.
 
-### Step 2: Run Release Notes
+3. **Recommend a version.** Read the approved `[Unreleased]` buckets: any **Removed** or "breaking" entry → **major**; any **Added** → **minor**; only **Fixed** / **Changed** / **Security** / **Deprecated** → **patch**. Read the current version (`grep '^version' Cargo.toml`), compute the next, present the recommendation, wait.
 
-Follow the `release-notes` skill completely. Read `skills/release-notes/SKILL.md` and execute all steps.
+   *Done when* the operator confirms the bump level.
 
-Present the generated changelog section. Allow the user to review and edit.
+4. **Commit the changelog.** If `CHANGELOG.md` has uncommitted edits, `git add CHANGELOG.md && git commit -m "docs: update changelog for vX.Y.Z"`.
 
-Do not proceed until the user approves the changelog.
+5. **Final confirm.** Show the summary — version, bump level, changelog shape, and the exact `cargo release <level> --execute` about to run (it bumps `Cargo.toml`, renames `[Unreleased]` to `[X.Y.Z] - <date>` via `release.toml`, tags, and pushes). **Do not run it without an explicit "yes."**
 
-### Step 3: Recommend Version
+   *Done when* the operator says "yes."
 
-Read the approved `[Unreleased]` section from `CHANGELOG.md` and analyze the categories:
+6. **Cut.** `cargo release <level> --execute`. On failure, show the error and stop.
 
-| Condition | Recommendation |
-|---|---|
-| Has entries in **Removed** or any entry mentions "breaking" | **major** bump |
-| Has entries in **Added** | **minor** bump |
-| Only has **Fixed**, **Changed**, **Security**, **Deprecated** | **patch** bump |
+7. **Verify.** `git tag -l "vX.Y.Z"` and `git ls-remote --tags origin "refs/tags/vX.Y.Z"`. Point the operator at the release workflow that now builds the artifacts.
 
-Get the current version:
+## Error recovery
 
-```bash
-grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)"/\1/'
-```
+- Before `cargo release`: safe to fix and re-run — this skill re-validates everything.
+- During `cargo release`: check what committed or tagged. Tag created but unpushed → `git push origin vX.Y.Z`. Version commit without tag → reset and retry.
+- After: the release is done; a CI failure is a workflow issue, not a rollback.
 
-Calculate the recommended next version and present:
+## Common mistakes
 
-> "Current version: v0.4.0
-> Changelog has: 2 Added, 1 Fixed, 1 Changed
-> Recommendation: **v0.5.0** (minor — new features added)
->
-> Accept this version, or specify a different bump level? (major/minor/patch)"
-
-Wait for user confirmation.
-
-### Step 4: Commit Changelog
-
-If `CHANGELOG.md` has uncommitted changes (from Step 2), commit them:
-
-```bash
-git add CHANGELOG.md
-git commit -m "docs: update changelog for vX.Y.Z"
-```
-
-Replace `X.Y.Z` with the recommended version from Step 3.
-
-### Step 5: Final Confirmation
-
-Present a summary:
-
-```
-Release Summary
-===============
-Version:   v0.5.0 (minor)
-Changelog: 2 Added, 1 Fixed, 1 Changed
-Checks:    all green (1 warning)
-Command:   cargo release minor --execute
-
-This will:
-  1. Bump version in Cargo.toml to 0.5.0
-  2. Rename [Unreleased] to [0.5.0] - 2026-04-04 in CHANGELOG.md
-  3. Add new [Unreleased] section
-  4. Create release commit: "chore: release v0.5.0"
-  5. Create tag: v0.5.0
-  6. Push commit and tag to origin
-
-Proceed? (yes/no)
-```
-
-**Do NOT run `cargo release` without explicit "yes" from the user.**
-
-### Step 6: Execute Release
-
-```bash
-cargo release {major|minor|patch} --execute
-```
-
-Where `{major|minor|patch}` matches the user-confirmed bump level from Step 3.
-
-Monitor the output. If `cargo release` fails, show the error and stop.
-
-### Step 7: Post-Release Verification
-
-Verify the tag was pushed:
-
-```bash
-git tag -l "vX.Y.Z"
-git ls-remote --tags origin "refs/tags/vX.Y.Z"
-```
-
-Remind the user:
-
-> "Release v0.5.0 tagged and pushed. GitHub Actions will now:
-> - Build release binaries for all targets
-> - Create the GitHub Release with artifacts
-> - Update the Homebrew tap
->
-> Monitor at: https://github.com/jackin-project/jackin/actions/workflows/release.yml"
-
-## Error Recovery
-
-If something goes wrong at any step:
-
-- **Before `cargo release`:** Safe to fix and re-run `/release`. The skill re-validates everything.
-- **During `cargo release`:** Check what was committed/tagged. If the tag was created but not pushed, you can push it manually: `git push origin vX.Y.Z`. If the version bump commit was created but not tagged, you may need to reset and retry.
-- **After `cargo release`:** The release is done. If CI fails, check the GitHub Actions workflow.
+- Running `cargo release` without the explicit "yes" — the one hard gate.
+- Letting a red readiness gate through to the cut.
+- Hand-editing the `[X.Y.Z]` version heading — `cargo-release` rewrites it via `release.toml` `pre-release-replacements`; double-editing corrupts the release commit.

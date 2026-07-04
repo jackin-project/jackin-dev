@@ -1,153 +1,66 @@
 ---
 name: jackin-release-notes
-description: Use when generating or updating the changelog, preparing release notes, or populating the Unreleased section of CHANGELOG.md for the jackin project
+description: Classifies every PR merged since the last tag into Keep a Changelog categories and writes the [Unreleased] section of CHANGELOG.md.
 argument-hint: "[context]"
 disable-model-invocation: true
 ---
 
 # jackin-release-notes
 
-Generates or updates the `[Unreleased]` section of `CHANGELOG.md` from merged PRs since the last release tag.
+**Classify** every PR merged since the last release tag into a Keep a Changelog bucket, then write the `[Unreleased]` section of `CHANGELOG.md`. The bar is exhaustive — every merged PR accounted for, none dropped, none doubled.
 
-## When to Use
+## When to use
 
-- Before a release, to populate the changelog
-- When you want to preview what would go into the next release
-- When asked to update or regenerate the changelog
+- Before a release, to populate the changelog.
+- When the operator asks to preview what the next release would contain.
+
+## When NOT to use
+
+- Cutting the release itself → `jackin-release` (it runs this skill as its notes step).
 
 ## Process
 
-### Step 1: Detect Last Tag
+1. **Find the boundary.** `LAST_TAG=$(git describe --tags --abbrev=0)`; if none, start from the initial commit (`git rev-list --max-parents=0 HEAD`). `TAG_DATE=$(git log -1 --format=%aI "$LAST_TAG")`.
 
-```bash
-LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-```
+   *Done when* you hold the boundary commit and its date.
 
-If no tags exist, this is the first release. Use the initial commit as the starting point:
+2. **Gather merged PRs.** `gh pr list --state merged --base main --search "merged:>$TAG_DATE" --json number,title,labels,mergedAt`.
 
-```bash
-FIRST_COMMIT=$(git rev-list --max-parents=0 HEAD)
-```
+   *Done when* every PR merged after the tag is in the list.
 
-### Step 2: Get the Tag Date
+3. **Classify each.** Sort by Conventional Commits prefix and label:
 
-```bash
-TAG_DATE=$(git log -1 --format=%aI "$LAST_TAG" 2>/dev/null || echo "")
-```
+   | Prefix / label | Bucket |
+   |---|---|
+   | `feat:` / `feature` | **Added** |
+   | `fix:` / `bug` | **Fixed** |
+   | `security:` | **Security** |
+   | `refactor:`, `chore:`, `docs:`, `ci:`, `build:` | **Changed** |
+   | `deprecate:` | **Deprecated** |
+   | `remove:` | **Removed** |
+   | no match | **Changed** (default) |
 
-### Step 3: Gather Merged PRs
+   Strip the prefix from the title; capitalize the first word (`feat: add TUI launcher` → `Add TUI launcher`).
 
-```bash
-gh pr list --state merged --base main --search "merged:>$TAG_DATE" --json number,title,labels,mergedAt --jq '.[] | {number, title, labels: [.labels[].name], mergedAt}'
-```
+   *Done when* every PR sits in exactly one bucket.
 
-### Step 4: Classify Each PR
+4. **Catch ungrouped commits.** `git log <last-tag>..HEAD --oneline --no-merges`; for each, `gh pr list --state merged --search "<sha>"`. Commits with no PR land under **Ungrouped commits**.
 
-Classify PRs into Keep a Changelog categories based on title prefix and labels:
+   *Done when* every non-merge commit since the tag is matched to a PR or listed.
 
-| Title prefix | Label | Category |
-|---|---|---|
-| `feat:`, `feature:` | `feature`, `enhancement` | **Added** |
-| `fix:` | `bug`, `bugfix` | **Fixed** |
-| `security:` | `security` | **Security** |
-| `refactor:`, `chore:`, `docs:`, `ci:`, `build:` | `refactor`, `chore`, `docs` | **Changed** |
-| `deprecate:` | `deprecated` | **Deprecated** |
-| `remove:` | `removed` | **Removed** |
+5. **Write `[Unreleased]`.** Keep a Changelog format: one section per non-empty bucket, each entry linking its PR (`[#N](…/pull/N)`). Replace the existing `[Unreleased]` block (between `## [Unreleased]` and the next `## [`) — ask before overwriting entries an operator already edited. Keep the `<!-- next-header -->` marker intact.
 
-If a PR doesn't match any prefix or label, place it in **Changed** as the default.
+   *Done when* `CHANGELOG.md` carries every merged PR under the right bucket, empty buckets omitted, and the marker survives.
 
-Strip the conventional commit prefix from the title when generating the entry. For example:
-- `feat: add TUI launcher` becomes `Add TUI launcher`
-- `fix: symlink escape in mounts` becomes `Fix symlink escape in mounts`
-
-Capitalize the first letter of each entry.
-
-### Step 5: Find Ungrouped Commits
-
-Find commits since the last tag that are not associated with any merged PR:
-
-```bash
-git log "$LAST_TAG"..HEAD --oneline --no-merges
-```
-
-For each commit, check if it was part of a PR:
-
-```bash
-gh pr list --state merged --search "<commit-sha>" --json number --jq '.[0].number'
-```
-
-Commits not associated with a PR go into the **Ungrouped commits** section.
-
-### Step 6: Format the Changelog Section
-
-Format as Keep a Changelog with PR links:
-
-```markdown
-## [Unreleased]
-
-### Added
-- Add TUI launcher for interactive agent selection ([#12](https://github.com/jackin-project/jackin/pull/12))
-
-### Fixed
-- Fix symlink escape in container mounts ([#15](https://github.com/jackin-project/jackin/pull/15))
-
-### Changed
-- Extract testing instructions into TESTING.md ([#18](https://github.com/jackin-project/jackin/pull/18))
-```
-
-Only include sections that have entries. Do not include empty sections.
-
-If there are ungrouped commits, add:
-
-```markdown
-### Ungrouped commits (not from PRs)
-- `205875a` docs: fix resolve_agent_source references
-- `efa41b8` docs: split TODO into individual files
-```
-
-### Step 7: Check for Existing Unreleased Section
-
-Read `CHANGELOG.md` and check if an `[Unreleased]` section already has content.
-
-If it does, ask the user:
-
-> "CHANGELOG.md already has entries in the [Unreleased] section. Do you want to:
-> A) Regenerate from scratch (replace existing entries)
-> B) Keep existing entries and add any missing PRs"
-
-### Step 8: Write to CHANGELOG.md
-
-If `CHANGELOG.md` does not exist, create it with the standard header:
-
-```markdown
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/),
-and this project adheres to [Semantic Versioning](https://semver.org/).
-
-<!-- next-header -->
-
-## [Unreleased]
-
-[generated entries here]
-```
-
-If `CHANGELOG.md` exists, replace the `## [Unreleased]` section content (everything between `## [Unreleased]` and the next `## [` heading or end of file).
-
-### Step 9: Present for Review
-
-Show the complete `[Unreleased]` section to the user. Allow them to:
-
-- Request edits ("move PR #42 to Added", "reword this entry", "remove this commit")
-- Approve as-is
-
-Do not proceed until the user approves the changelog content.
+6. **Present for review.** Show the section; let the operator re-classify or reword. Do not proceed to a release until approved.
 
 ## Idempotency
 
-This skill is safe to run multiple times:
-- It always checks the current state of `CHANGELOG.md` before writing
-- It asks before overwriting existing entries
-- PR data is fetched fresh from GitHub each time
+Safe to re-run: reads `CHANGELOG.md` fresh each time, asks before overwriting existing entries, fetches PR data live from GitHub.
+
+## Common mistakes
+
+- Dropping a PR that has no conventional-commit prefix — it defaults to **Changed**, never omitted.
+- Listing an empty bucket ("no **Removed** entries" is noise — drop the section).
+- Forgetting the PR link in each entry.
+- Overwriting an operator-edited `[Unreleased]` without asking.

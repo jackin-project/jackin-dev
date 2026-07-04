@@ -1,167 +1,61 @@
 ---
 name: jackin-release-check
-description: Use when preparing for a release, verifying release readiness, or running pre-release checks on the jackin project
+description: Runs the jackin❯ release-readiness gates.
 argument-hint: "[context]"
 disable-model-invocation: true
 ---
 
 # jackin-release-check
 
-Pre-release validation for the jackin project. Runs a series of checks and produces a readiness report.
+Run the release-readiness **gates**. Each gate is binary — green passes, red blocks — and the release is ready only when every gate is green (warnings surface but do not block). The commands are the repo's own (from `CONTRIBUTING.md` merge-readiness + `.github/workflows/ci.yml`), never stripped-down substitutes.
 
-## When to Use
+## When to use
 
-- Before running `/release`
-- When you want to verify the project is ready to release
-- After fixing issues found in a previous release check
+- Before cutting a release, or when the operator asks whether the project is release-ready.
+
+## When NOT to use
+
+- Cutting the release itself → `jackin-release` (it runs this skill as its first gate).
 
 ## Process
 
-Run each check in order. Collect results into a readiness report.
+Run each gate in order; collect a green / red / skip verdict into a one-line-per-gate report.
 
-### Check 1: CI Status
+1. **CI gate.** `gh run list --workflow=ci.yml --branch=main --limit=1 --json conclusion --jq '.[0].conclusion'` — green only on `success`. If `docker/construct/**` or `docs/**` changed since the last tag (`git diff --name-only <last-tag>..HEAD -- <path>`), also require `construct.yml` / `docs.yml` green on main.
 
-Verify the latest CI run on `main` is green:
+   *Done when* every CI workflow that owns a changed path is green.
 
-```bash
-gh run list --workflow=ci.yml --branch=main --limit=1 --json status,conclusion --jq '.[0]'
-```
+2. **Static gates.** `cargo fmt --check`; `cargo clippy --all-targets --all-features -- -D warnings`. Red on any violation.
 
-If `conclusion` is not `success`, report **FAIL** and stop.
+   *Done when* both exit 0.
 
-Also check path-specific workflows if their paths changed since the last tag:
+3. **Test gate.** `cargo nextest run --all-features`; `cargo nextest run -p jackin --features e2e --profile docker-e2e`. Red on any failure.
 
-```bash
-LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+   *Done when* both suites pass.
 
-# Check if docker/construct/** changed since last tag
-if [ -n "$LAST_TAG" ] && [ -n "$(git diff --name-only "$LAST_TAG"..HEAD -- docker/construct/)" ]; then
-  gh run list --workflow=construct.yml --branch=main --limit=1 --json status,conclusion --jq '.[0]'
-fi
+4. **Doc-link gate.** Walk internal links under `docs/content/docs/` (relative paths + `href`s); verify each target file exists. Red only on a broken link to a shipped page; warn on external URLs you cannot reach.
 
-# Check if docs/** changed since last tag
-if [ -n "$LAST_TAG" ] && [ -n "$(git diff --name-only "$LAST_TAG"..HEAD -- docs/)" ]; then
-  gh run list --workflow=docs.yml --branch=main --limit=1 --json status,conclusion --jq '.[0]'
-fi
-```
+   *Done when* every internal link resolves.
 
-Report result as **PASS**, **FAIL**, or **SKIP** (if no changes in those paths).
+5. **TODO freshness.** Read `TODO.md` and `todo/`; flag items referencing completed work or showing no recent activity. Warn — does not block.
 
-### Check 2: Local Tests
+   *Done when* every TODO item is either live or flagged stale.
 
-```bash
-cargo test --locked
-```
+6. **Security exceptions.** Read `SECURITY_EXCEPTIONS.md`; ask the operator whether each entry is still current. Review (blocks) until confirmed or the file is updated and re-read.
 
-If any test fails, report **FAIL** and stop.
+   *Done when* the operator confirms the catalog.
 
-### Check 3: Clippy
+7. **Direct-commit audit.** `git log <last-tag>..HEAD --oneline --no-merges`; for each commit, `gh pr list --state merged --search "<sha>"`. Warn on commits with no PR — does not block.
 
-```bash
-cargo clippy -- -D warnings
-```
+   *Done when* every non-merge commit since the last tag is matched to a PR or listed as ungrouped.
 
-If clippy reports any warnings-as-errors, report **FAIL** and stop.
+## Report
 
-### Check 4: Format Check
+One line per gate: `✓` green, `✗` red (block), `⚠` warn, `-` skip. A red gate stops the release; a warn surfaces for the operator to accept or fix.
 
-```bash
-cargo fmt --check
-```
+## Common mistakes
 
-If formatting violations found, report **FAIL** and stop.
-
-### Check 5: Direct Commit Warning
-
-Find commits since the last tag that are not merge commits from PRs:
-
-```bash
-LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-if [ -n "$LAST_TAG" ]; then
-  git log "$LAST_TAG"..HEAD --oneline --no-merges
-fi
-```
-
-For each commit, check if it was part of a PR:
-
-```bash
-gh pr list --state merged --search "<commit-sha>" --json number --jq '.[0].number'
-```
-
-If there are commits not associated with any PR, report **WARN** with the list. Do not block.
-
-### Check 6: Doc Link Validation
-
-Check for broken internal links in `docs/content/docs/`:
-
-- Read markdown files and extract internal links (relative paths, `href` attributes)
-- Verify each linked file exists
-- For external URLs, verify they return HTTP 200 (skip rate-limited domains)
-
-Report **PASS** or **WARN** with list of broken links.
-
-### Check 7: TODO Freshness
-
-Read `TODO.md` and all files in `todo/`:
-
-- Check if any items reference work that has already been completed (look for matching commits or closed PRs)
-- Check if any items are stale (no related activity in recent commits)
-
-Report **PASS** or **WARN** with findings.
-
-### Check 8: Security Exceptions
-
-Read `SECURITY_EXCEPTIONS.md` and present its contents to the user.
-
-Ask: **"Are these security exceptions still current? (yes/no)"**
-
-If the user says no, report **REVIEW** — the user needs to update the file before releasing.
-
-If the user says yes, report **PASS**.
-
-### Check 9: Docker Build Status
-
-Check if Docker-related files changed since the last tag:
-
-```bash
-LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-CONSTRUCT_CHANGED=$(git diff --name-only "$LAST_TAG"..HEAD -- docker/construct/ 2>/dev/null)
-RUNTIME_CHANGED=$(git diff --name-only "$LAST_TAG"..HEAD -- docker/runtime/ 2>/dev/null)
-```
-
-If changed, verify the `construct.yml` workflow passed (already checked in Check 1). Report **PASS** or **SKIP**.
-
-## Output
-
-Present a structured readiness report:
-
-```
-Release Readiness Report
-========================
-✓ CI: all workflows green
-✓ Local tests: N passed, 0 failed
-✓ Clippy: no warnings
-✓ Format: clean
-⚠ Direct commits: N commits since vX.Y.Z not from PRs
-  - <sha> <message>
-✓ Doc links: all valid
-✓ TODOs: up to date
-? Security exceptions: review required (N items)
-✓ Docker: builds pass (or: no changes, skipped)
-
-Result: PASS | REVIEW NEEDED | FAIL
-```
-
-## Blocking vs Non-blocking
-
-| Check | Failure behavior |
-|---|---|
-| CI status | **BLOCK** — cannot release with red CI |
-| Local tests | **BLOCK** — cannot release with failing tests |
-| Clippy | **BLOCK** — cannot release with clippy errors |
-| Format | **BLOCK** — cannot release with fmt violations |
-| Direct commits | **WARN** — show list, do not block |
-| Doc links | **WARN** — show broken links, do not block |
-| TODO freshness | **WARN** — show stale items, do not block |
-| Security exceptions | **REVIEW** — ask user, block only if user says "no" |
-| Docker builds | **BLOCK** if changed and CI failed; **SKIP** if unchanged |
+- Running `cargo test --locked` or `cargo clippy -- -D warnings` (stripped flags) — those are not the repo's gates; the real commands carry `--all-targets --all-features` and use `nextest`.
+- Treating a warn as a block, or a red gate as a warn.
+- Skipping the path-specific CI workflows when `docker/` or `docs/` changed since the last tag.
+- Inventing a doc-link check instead of walking the real `docs/content/docs/` tree.
