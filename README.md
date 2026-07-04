@@ -67,16 +67,49 @@ Run the jackin' pre-merge gate **fail-closed**, retire the roadmap item into doc
 /plugin install jackin-dev@jackin-marketplace
 ```
 
-### Codex, Amp, OpenCode, Kimi
+### Codex & Amp
 
-All four read `~/.agents/skills/`. Install the tree there once with the [`skills`](https://www.npmjs.com/package/skills) CLI (per agent, since agent CLIs aren't auto-detected in every environment):
+Both read the `.agents/skills/` project tree. Install with the [`skills`](https://www.npmjs.com/package/skills) CLI (per agent, since agent CLIs aren't auto-detected in every environment):
 
 ```sh
 npx -y skills add "jackin-project/jackin-dev" -s '*' -a codex --global --yes
 npx -y skills add "jackin-project/jackin-dev" -s '*' -a amp   --global --yes
 ```
 
-`--global` writes the canonical `~/.agents/skills/<skill>/` tree, which OpenCode and Kimi read from the same path. Codex additionally reads `.codex-plugin/plugin.json` (the `/plugins` flow); Amp also offers `amp skill add jackin-project/jackin-dev`. Pin to a release tag in production (`jackin-project/jackin-dev#vX.Y.Z`).
+`-a codex --global` writes `~/.codex/skills/` and Codex also reads `.codex-plugin/plugin.json` (the `/plugins` flow); `-a amp --global` writes `~/.config/agents/skills/`, and Amp also offers `amp skill add jackin-project/jackin-dev`.
+
+### OpenCode
+
+```sh
+npx -y skills add "jackin-project/jackin-dev" -s '*' -a opencode --global --yes
+```
+
+Writes `~/.config/opencode/skills/`. OpenCode also auto-loads the shared `~/.agents/skills/` tree, so a Kimi-Code or Codex global install is visible to OpenCode with no extra step.
+
+### Grok
+
+Grok Build (xAI) isn't yet an agent target in the `skills` CLI, so install the tree by hand. Grok discovers skills from `.grok/skills/` (walked up to the repo root) and `~/.grok/skills/`:
+
+```sh
+# global — every repo on this machine
+git clone --depth 1 https://github.com/jackin-project/jackin-dev /tmp/jackin-dev &&
+  mkdir -p ~/.grok/skills && cp -R /tmp/jackin-dev/skills/* ~/.grok/skills/
+
+# …or per-project
+mkdir -p .grok/skills && cp -R /tmp/jackin-dev/skills/* .grok/skills/
+```
+
+Verify with `grok inspect`; each skill surfaces as a `/<skill-name>` slash command. Grok also reads `~/.agents/skills/` (AGENTS.md compat) and `.claude/` (Claude Code compat), so if you've already installed there, Grok picks the skills up with no extra step.
+
+### Kimi Code
+
+Kimi Code CLI (the TypeScript agent; `kimi-code-cli`) reads `~/.agents/skills/`:
+
+```sh
+npx -y skills add "jackin-project/jackin-dev" -s '*' -a kimi-code-cli --global --yes
+```
+
+Pin to a release tag in production (`jackin-project/jackin-dev#vX.Y.Z`).
 
 The [`jackin-the-architect`](https://github.com/jackin-project/jackin-the-architect) role image bakes this in, so every agent it launches has the skills with no per-agent step.
 
