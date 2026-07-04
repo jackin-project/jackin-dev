@@ -67,16 +67,23 @@ Run the jackin' pre-merge gate **fail-closed**, retire the roadmap item into doc
 /plugin install jackin-dev@jackin-marketplace
 ```
 
-### Codex & Amp
+The agents below install via the [`skills`](https://www.npmjs.com/package/skills) CLI (per agent, since agent CLIs aren't auto-detected in every environment). Pin to a release tag in production (`jackin-project/jackin-dev#vX.Y.Z`).
 
-Both read the `.agents/skills/` project tree. Install with the [`skills`](https://www.npmjs.com/package/skills) CLI (per agent, since agent CLIs aren't auto-detected in every environment):
+### Codex
 
 ```sh
 npx -y skills add "jackin-project/jackin-dev" -s '*' -a codex --global --yes
-npx -y skills add "jackin-project/jackin-dev" -s '*' -a amp   --global --yes
 ```
 
-`-a codex --global` writes `~/.codex/skills/` and Codex also reads `.codex-plugin/plugin.json` (the `/plugins` flow); `-a amp --global` writes `~/.config/agents/skills/`, and Amp also offers `amp skill add jackin-project/jackin-dev`.
+Writes `~/.codex/skills/` (or `$CODEX_HOME/skills/`). Codex also reads `.codex-plugin/plugin.json` — the `/plugins` flow.
+
+### Amp
+
+```sh
+npx -y skills add "jackin-project/jackin-dev" -s '*' -a amp --global --yes
+```
+
+Writes `~/.config/agents/skills/`. Amp also offers `amp skill add jackin-project/jackin-dev`.
 
 ### OpenCode
 
@@ -84,7 +91,7 @@ npx -y skills add "jackin-project/jackin-dev" -s '*' -a amp   --global --yes
 npx -y skills add "jackin-project/jackin-dev" -s '*' -a opencode --global --yes
 ```
 
-Writes `~/.config/opencode/skills/`. OpenCode also auto-loads the shared `~/.agents/skills/` tree, so a Kimi-Code or Codex global install is visible to OpenCode with no extra step.
+Writes `~/.config/opencode/skills/`. OpenCode also auto-loads the shared `~/.agents/skills/` tree, so a Codex or Kimi-Code global install is visible to OpenCode with no extra step.
 
 ### Grok
 
@@ -103,13 +110,11 @@ Verify with `grok inspect`; each skill surfaces as a `/<skill-name>` slash comma
 
 ### Kimi Code
 
-Kimi Code CLI (the TypeScript agent; `kimi-code-cli`) reads `~/.agents/skills/`:
-
 ```sh
 npx -y skills add "jackin-project/jackin-dev" -s '*' -a kimi-code-cli --global --yes
 ```
 
-Pin to a release tag in production (`jackin-project/jackin-dev#vX.Y.Z`).
+Kimi Code CLI (the TypeScript agent; `kimi-code-cli`) — writes the shared `~/.agents/skills/` tree.
 
 The [`jackin-the-architect`](https://github.com/jackin-project/jackin-the-architect) role image bakes this in, so every agent it launches has the skills with no per-agent step.
 
