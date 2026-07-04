@@ -62,12 +62,12 @@ Run the jackin' pre-merge gate **fail-closed**, retire the roadmap item into doc
 
 ### Claude Code
 
-```
-/plugin marketplace add jackin-project/jackin-marketplace
-/plugin install jackin-dev@jackin-marketplace
+```sh
+claude plugin marketplace add jackin-project/jackin-marketplace
+claude plugin install jackin-dev@jackin-marketplace
 ```
 
-Prefer each agent's native command where one exists (Codex, Amp, Grok). OpenCode and Kimi Code have no native skill-from-git installer, so they fall back to the [`skills`](https://www.npmjs.com/package/skills) CLI. Pin to a release tag in production.
+Prefer each agent's native CLI where one exists (Claude Code, Codex, Amp, Grok). OpenCode and Kimi Code have no native skill-from-git installer, so they fall back to the [`skills`](https://www.npmjs.com/package/skills) CLI. Pin to a release tag in production.
 
 ### Codex
 
@@ -92,7 +92,7 @@ Native. Writes `~/.config/agents/skills/`.
 npx -y skills add "jackin-project/jackin-dev" -s '*' -a opencode --global --yes
 ```
 
-OpenCode has no native skill-from-git installer (`opencode plugin` loads npm modules only), so the `skills` CLI writes `~/.config/opencode/skills/`. OpenCode also auto-loads the shared `~/.agents/skills/` tree.
+OpenCode has no native skill-from-git installer (`opencode plugin` loads npm modules only). The `skills` CLI writes the shared `~/.agents/skills/` tree, which OpenCode auto-loads.
 
 ### Grok
 
