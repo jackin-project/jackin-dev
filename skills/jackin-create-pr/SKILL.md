@@ -1,24 +1,24 @@
 ---
-name: create-pr
-description: Opens a pull request for a small jackin' change with the correct body shape and auto-selected verify-locally blocks. Use when the operator runs /jackin-dev:create-pr.
+name: jackin-create-pr
+description: Opens a pull request for a small jackin❯ change with the correct body shape and auto-selected verify-locally blocks. Use when the operator runs /jackin-dev:jackin-create-pr.
 argument-hint: "[--branch <name>|--auto-branch] [--title <msg>]"
 disable-model-invocation: true
 ---
 
-# create-pr
+# jackin-create-pr
 
-Open a PR for a **small fix** in the jackin' repo — typo, dependency bump, one-line bugfix, doc tweak — that needs no roadmap item. Also the shared PR-mechanics path other skills reuse. Commits inline; no separate commit skill.
+Open a PR for a **small fix** in the jackin❯ repo — typo, dependency bump, one-line bugfix, doc tweak — that needs no roadmap item. Also the shared PR-mechanics path other skills reuse. Commits inline; no separate commit skill.
 
-jackin' rule files auto-load — `PULL_REQUESTS.md`, `.github/` agent rules, `BRANCHING.md`, `COMMITS.md`. This skill sequences them, never restates them. Read them for full rules.
+jackin❯ rule files auto-load — `PULL_REQUESTS.md`, `.github/` agent rules, `BRANCHING.md`, `COMMITS.md`. This skill sequences them, never restates them. Read them for full rules.
 
 ## When to use
 
-- Operator runs `/jackin-dev:create-pr`.
+- Operator runs `/jackin-dev:jackin-create-pr`.
 - Small, self-contained change (no design, no roadmap item).
 
 ## When NOT to use
 
-- Feature/idea worth a roadmap item → `/jackin-dev:propose`.
+- Feature/idea worth a roadmap item → `/jackin-dev:jackin-propose`.
 - Implementing a finalized roadmap item → `/goal Implement <slug>.md`.
 
 ## Arguments
@@ -45,4 +45,4 @@ jackin' rule files auto-load — `PULL_REQUESTS.md`, `.github/` agent rules, `BR
 
 ## Tooling
 
-`cargo xtask pr body` (jackin' repo) emits the change digest + the template skeleton with verify-locally blocks auto-selected from the diff. Shared with `propose`. The binary guarantees the mechanical parts (block selection, capsule ordering, exact command text, heredoc quoting); the agent writes the prose.
+`cargo xtask pr body` (jackin❯ repo) emits the change digest + the template skeleton with verify-locally blocks auto-selected from the diff. Shared with `propose`. The binary guarantees the mechanical parts (block selection, capsule ordering, exact command text, heredoc quoting); the agent writes the prose.

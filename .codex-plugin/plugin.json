@@ -1,6 +1,6 @@
 {
   "name": "jackin-dev",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Development workflow skills for the jackin project: spec-driven feature workflow, pull requests, research, release management, validation, and changelog generation",
   "author": {
     "name": "Alexey Zhokhov"

@@ -2,9 +2,9 @@
 
 Development workflow plugin for the [jackin](https://github.com/jackin-project/jackin) project. Skills for the spec-driven feature workflow, pull requests, research, and release management.
 
-**Skills are the orchestration layer; the jackin' repo's rule files stay the source of truth.** Each skill sequences steps that are otherwise scattered across the repo's auto-loaded topic files (`PULL_REQUESTS.md`, `BRANCHING.md`, `COMMITS.md`, `PRERELEASE.md`, …) and names the governing rule instead of copying it — so when a rule changes, the skill keeps pointing at it. The full behavior of each skill lives in its `skills/<name>/SKILL.md`; this README is the map.
+**Skills are the orchestration layer; the jackin❯ repo's rule files stay the source of truth.** Each skill sequences steps that are otherwise scattered across the repo's auto-loaded topic files (`PULL_REQUESTS.md`, `BRANCHING.md`, `COMMITS.md`, `PRERELEASE.md`, …) and names the governing rule instead of copying it — so when a rule changes, the skill keeps pointing at it. The full behavior of each skill lives in its `skills/<name>/SKILL.md`; this README is the map.
 
-All skills are **manual-only** — invoke each explicitly as `/jackin-dev:<name>`; none auto-fire (each sets `disable-model-invocation: true`).
+All skills are **manual-only** — invoke each explicitly as `/jackin-dev:jackin-<name>`; none auto-fire (each sets `disable-model-invocation: true`).
 
 ## Workflow
 
@@ -12,53 +12,53 @@ The roadmap item `.mdx` is the living change-spec while a change is open; on shi
 
 ```
 FEATURE / IDEA
-  propose      roadmap item draft + early PR  (never codes; collects, then stops)
-  brainstorm   freeform discussion → writes decisions into ## Design
+  jackin-propose     roadmap item draft + early PR  (never codes; collects, then stops)
+  jackin-brainstorm  freeform discussion → writes decisions into ## Design
   /goal Implement <slug>.md   build the finalized item  (external spec-runner)
-  merge-pr     pre-merge gate → retire item into docs → squash-merge
+  jackin-merge-pr    pre-merge gate → retire item into docs → squash-merge
 
 RESEARCH
-  research → author prompt.mdx brief → /goal Follow <brief> → dossier under docs/content/docs/research/<slug>/
+  jackin-research → author prompt.mdx brief → /goal Follow <brief> → dossier under docs/content/docs/research/<slug>/
 
 SMALL FIX
-  create-pr → merge-pr   (branch + inline commit + PR, no roadmap item)
+  jackin-create-pr → jackin-merge-pr   (branch + inline commit + PR, no roadmap item)
 ```
 
-`goal` is the universal spec-runner (external, used not built here): a roadmap item → code; a research brief → dossier. PR mechanics are shared by `propose` + `create-pr`; no skill calls another skill.
+`goal` is the universal spec-runner (external, used not built here): a roadmap item → code; a research brief → dossier. PR mechanics are shared by `jackin-propose` + `jackin-create-pr`; no skill calls another skill.
 
 ## Feature skills
 
-### `propose`
+### `jackin-propose`
 Open a feature/idea as a tracked **roadmap item + early PR**. Scaffolds `roadmap/<slug>.mdx` (`Problem` / `Why It Matters` / `Design` / `Tasks` / `Related Files`) + its sidebar entry, fills Problem/Why from the idea, opens the PR, and **stops** — it never writes code or fills `Design`/`Tasks`.
-*Flags:* `--branch <name>` / `--auto-branch`, `--no-pr`, `--research`. *Not for:* small fixes (→ `create-pr`).
+*Flags:* `--branch <name>` / `--auto-branch`, `--no-pr`, `--research`. *Not for:* small fixes (→ `jackin-create-pr`).
 
-### `brainstorm`
-Turn an item's intent into concrete **design decisions** through freeform back-and-forth, written incrementally into `## Design` (decision + one-line why; resumable). Pulls in jackin' design principles and rule files as constraints. Never codes; never fills `Tasks`.
+### `jackin-brainstorm`
+Turn an item's intent into concrete **design decisions** through freeform back-and-forth, written incrementally into `## Design` (decision + one-line why; resumable). Pulls in jackin❯ design principles and rule files as constraints. Never codes; never fills `Tasks`.
 *Flags:* `--research`, `--resume`.
 
-### `research`
+### `jackin-research`
 Produce a standalone **multi-page dossier** under `docs/content/docs/research/<slug>/` — `index.mdx` + `prompt.mdx` brief + numbered chapters. Gathers web (via `deep-research`) + codebase evidence; every external claim sourced, every local number method-stamped. Brief-driven: author the brief, then execute via `/goal Follow <brief>`. Gathers — does not make design decisions.
 *Flags:* `--brief-only`, `--in-roadmap` (small research only), `--web-only` / `--codebase-only`.
 
-### `create-pr`
+### `jackin-create-pr`
 Open a PR for a **small fix** (typo, dep bump, one-line bugfix, doc tweak) — no roadmap item. Also the shared PR-mechanics path: branch, inline commit (Conventional Commits, DCO `-s`), body from `.github/PULL_REQUEST_TEMPLATE.md` with verify-locally blocks auto-selected from the changed paths.
-*Flags:* `--branch <name>` / `--auto-branch`, `--title <msg>`. *Not for:* feature work (→ `propose`).
+*Flags:* `--branch <name>` / `--auto-branch`, `--title <msg>`. *Not for:* feature work (→ `jackin-propose`).
 
-### `merge-pr`
-Run the jackin' pre-merge gate **fail-closed**, retire the roadmap item into docs, then squash-merge. Gates: blast-radius confirm (schema / auth / workflow / force-push), poll CI until green, roadmap retirement (retire-into-docs or status move), metadata reconcile, squash with `(#N)` + trailers.
+### `jackin-merge-pr`
+Run the jackin❯ pre-merge gate **fail-closed**, retire the roadmap item into docs, then squash-merge. Gates: blast-radius confirm (schema / auth / workflow / force-push), poll CI until green, roadmap retirement (retire-into-docs or status move), metadata reconcile, squash with `(#N)` + trailers.
 *Flags:* `--no-poll`, `--admin <check>`.
 
 ## Release skills
 
 | Skill | Description |
 |---|---|
-| `release-check` | Pre-release validation: CI status, tests, clippy, fmt, doc links, TODOs, security exceptions, Docker build |
-| `release-notes` | Generate the `[Unreleased]` changelog from merged PRs since the last tag (Keep a Changelog format) |
-| `release` | Full orchestrator: `release-check` → notes → version recommendation → confirm → `cargo release` |
+| `jackin-release-check` | Pre-release validation: CI status, tests, clippy, fmt, doc links, TODOs, security exceptions, Docker build |
+| `jackin-release-notes` | Generate the `[Unreleased]` changelog from merged PRs since the last tag (Keep a Changelog format) |
+| `jackin-release` | Full orchestrator: `jackin-release-check` → notes → version recommendation → confirm → `cargo release` |
 
 ## Installation
 
-`SKILL.md` is a portable standard — one `skills/<name>/` source serves every agent jackin' supports; only the install path differs.
+`SKILL.md` is a portable standard — one `skills/<name>/` source serves every agent jackin❯ supports; only the install path differs.
 
 ### Claude Code
 
@@ -120,7 +120,7 @@ The [`jackin-the-architect`](https://github.com/jackin-project/jackin-the-archit
 
 ## How skills use `cargo xtask`
 
-The skills shell out to `cargo xtask` subcommands (they live in the jackin' repo and CI reuses them → PR/main parity) for the steps that are **mechanical, exact, or must-not-be-forgotten**. The division is deliberate:
+The skills shell out to `cargo xtask` subcommands (they live in the jackin❯ repo and CI reuses them → PR/main parity) for the steps that are **mechanical, exact, or must-not-be-forgotten**. The division is deliberate:
 
 - **The binary** does the deterministic work — scaffold a file, edit sidebar JSON, classify a diff, emit the exact canonical text, run a validator — and hands the agent **facts + a correct skeleton**, then **verifies** the result. It never writes prose or makes a content decision.
 - **The agent** does the judgment — read the diff, decide what shipped, write the prose, decide where content moves.
@@ -129,16 +129,16 @@ So the binary backstops what an agent slips on (a forgotten verify block, a dang
 
 | Skill | `cargo xtask` used | Binary does (deterministic) | Agent does (judgment) |
 |---|---|---|---|
-| `propose` | `change new`, `roadmap audit` | scaffold the roadmap `.mdx` + register the sidebar entry; validate the sidebar | pick the group; write Problem / Why It Matters |
-| `brainstorm` | — | — | discuss; write `## Design` into the `.mdx` |
-| `research` | `research scaffold`, `research check` | create the dossier folder + `meta.json`; validate `pages` against disk | author the brief; write `index` + chapters |
-| `create-pr` | `pr body` | change digest + template with verify-locally blocks selected and byte-exact | write Summary / What ships / Behavior changes |
-| `merge-pr` | `roadmap retire --plan` / `--apply`, `roadmap audit` (+ CI `schema-check`) | worklist of inbound links + page content; remove the `meta.json` entry, delete the `.mdx`, run the audit, fail on a dangling link | move prose to `guides/`/`reference/`; write the `## Completed` bullet; repoint links |
-| `release-check` | — | — | review CI / test / exception results |
-| `release-notes` | — | — | classify merged PRs into changelog categories |
-| `release` | — | — | version recommendation; confirm; run `cargo release` |
+| `jackin-propose` | `change new`, `roadmap audit` | scaffold the roadmap `.mdx` + register the sidebar entry; validate the sidebar | pick the group; write Problem / Why It Matters |
+| `jackin-brainstorm` | — | — | discuss; write `## Design` into the `.mdx` |
+| `jackin-research` | `research scaffold`, `research check` | create the dossier folder + `meta.json`; validate `pages` against disk | author the brief; write `index` + chapters |
+| `jackin-create-pr` | `pr body` | change digest + template with verify-locally blocks selected and byte-exact | write Summary / What ships / Behavior changes |
+| `jackin-merge-pr` | `roadmap retire --plan` / `--apply`, `roadmap audit` (+ CI `schema-check`) | worklist of inbound links + page content; remove the `meta.json` entry, delete the `.mdx`, run the audit, fail on a dangling link | move prose to `guides/`/`reference/`; write the `## Completed` bullet; repoint links |
+| `jackin-release-check` | — | — | review CI / test / exception results |
+| `jackin-release-notes` | — | — | classify merged PRs into changelog categories |
+| `jackin-release` | — | — | version recommendation; confirm; run `cargo release` |
 
-### `create-pr` flow
+### `jackin-create-pr` flow
 
 ```
 [agent]  branch → commit inline (Conventional Commits, DCO -s) → push
@@ -151,9 +151,9 @@ So the binary backstops what an agent slips on (a forgotten verify block, a dang
 [agent]  gh pr create --body-file  →  reply with URL + verify commands
 ```
 
-`propose` reuses this `pr body` path for its early PR.
+`jackin-propose` reuses this `pr body` path for its early PR.
 
-### `merge-pr` flow
+### `jackin-merge-pr` flow
 
 ```
 [agent]  resolve PR; read gh pr view + gh pr diff; blast-radius classify
@@ -172,11 +172,11 @@ So the binary backstops what an agent slips on (a forgotten verify block, a dang
 
 ### `schema-check` — a CI gate, not a skill
 
-`cargo xtask schema-check --base origin/main` runs in `.github/workflows/ci.yml`. It detects a `CURRENT_*_VERSION` bump and fails the build unless all required artifacts ship (migration step, `from-<predecessor>/` fixture, `schema-versions.mdx` Timeline entry). No skill owns it — running in CI is what makes the 5-artifact rule enforced rather than reviewer-eyeballed. `merge-pr` only reads its result; the agent may run it locally during `/goal Implement` to self-check before pushing.
+`cargo xtask schema-check --base origin/main` runs in `.github/workflows/ci.yml`. It detects a `CURRENT_*_VERSION` bump and fails the build unless all required artifacts ship (migration step, `from-<predecessor>/` fixture, `schema-versions.mdx` Timeline entry). No skill owns it — running in CI is what makes the 5-artifact rule enforced rather than reviewer-eyeballed. `jackin-merge-pr` only reads its result; the agent may run it locally during `/goal Implement` to self-check before pushing.
 
 ### xtask inventory
 
-Built in the jackin' repo and used above: `change new`, `research scaffold`, `research check`, `roadmap audit`, `pr body`, `roadmap retire`, `schema-check`. Full reference: the xtask inventory page in the jackin' docs.
+Built in the jackin❯ repo and used above: `change new`, `research scaffold`, `research check`, `roadmap audit`, `pr body`, `roadmap retire`, `schema-check`. Full reference: the xtask inventory page in the jackin❯ docs.
 
 ## Requirements
 

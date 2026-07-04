@@ -1,23 +1,23 @@
 ---
-name: research
-description: Produces a standalone multi-page research dossier on the jackin' docs site from a brief, drawing on web and codebase evidence. Use when the operator runs /jackin-dev:research.
+name: jackin-research
+description: Produces a standalone multi-page research dossier on the jackin❯ docs site from a brief, drawing on web and codebase evidence. Use when the operator runs /jackin-dev:jackin-research.
 argument-hint: "<slug> [--brief-only] [--in-roadmap] [--web-only|--codebase-only]"
 disable-model-invocation: true
 ---
 
-# research
+# jackin-research
 
-Produce a standalone **research dossier** — a multi-page deliverable published on the jackin' docs site — for an open question or roadmap topic. Brief-driven: author the brief, then execute it. Gathers and synthesizes evidence (web + codebase); does not make product design decisions.
+Produce a standalone **research dossier** — a multi-page deliverable published on the jackin❯ docs site — for an open question or roadmap topic. Brief-driven: author the brief, then execute it. Gathers and synthesizes evidence (web + codebase); does not make product design decisions.
 
-Reference implementation: `docs/content/docs/research/token-optimization-research/` in the jackin' repo.
+Reference implementation: `docs/content/docs/research/token-optimization-research/` in the jackin❯ repo.
 
 ## When to use
 
-- Operator runs `/jackin-dev:research <slug>` for a substantial investigation.
+- Operator runs `/jackin-dev:jackin-research <slug>` for a substantial investigation.
 
 ## When NOT to use
 
-- Design decisions on a roadmap item → `/jackin-dev:brainstorm`.
+- Design decisions on a roadmap item → `/jackin-dev:jackin-brainstorm`.
 - Quick lookup → `deep-research` or Explore directly, no dossier.
 
 ## Arguments

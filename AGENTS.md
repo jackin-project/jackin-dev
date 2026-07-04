@@ -2,16 +2,16 @@
 
 A plugin providing development workflow skills for the [jackin](https://github.com/jackin-project/jackin) project.
 
-All skills are **manual-only** — the operator invokes each explicitly as `/jackin-dev:<name>`. None auto-fire (each `SKILL.md` sets `disable-model-invocation: true`).
+All skills are **manual-only** — the operator invokes each explicitly as `/jackin-dev:jackin-<name>`. None auto-fire (each `SKILL.md` sets `disable-model-invocation: true`).
 
 ## Skills
 
-Eight manual-only skills live under `skills/`: `propose`, `brainstorm`, `research`, `create-pr`, `merge-pr` (feature workflow) and `release-check`, `release-notes`, `release`.
+Eight manual-only skills live under `skills/`: `jackin-propose`, `jackin-brainstorm`, `jackin-research`, `jackin-create-pr`, `jackin-merge-pr` (feature workflow) and `jackin-release-check`, `jackin-release-notes`, `jackin-release`.
 
 - **What each does, the workflow model, and the design** — see [README.md](README.md).
 - **The full process for one skill** — see its `skills/<name>/SKILL.md`.
 
-Invoke explicitly as `/jackin-dev:<name>`; nothing auto-fires.
+Invoke explicitly as `/jackin-dev:jackin-<name>`; nothing auto-fires.
 
 ## Requirements
 

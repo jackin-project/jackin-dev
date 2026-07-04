@@ -1,10 +1,11 @@
 ---
-name: release
+name: jackin-release
 description: Use when performing a release, cutting a new version, or running the full release process for the jackin project
 argument-hint: "[major|minor|patch|version]"
+disable-model-invocation: true
 ---
 
-# Release
+# jackin-release
 
 Full release orchestrator for the jackin project. Runs pre-release validation, generates changelog, recommends version, and executes `cargo release`.
 

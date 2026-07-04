@@ -1,10 +1,11 @@
 ---
-name: release-check
+name: jackin-release-check
 description: Use when preparing for a release, verifying release readiness, or running pre-release checks on the jackin project
 argument-hint: "[context]"
+disable-model-invocation: true
 ---
 
-# Release Check
+# jackin-release-check
 
 Pre-release validation for the jackin project. Runs a series of checks and produces a readiness report.
 

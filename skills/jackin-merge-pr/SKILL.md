@@ -1,21 +1,21 @@
 ---
-name: merge-pr
-description: Runs the jackin' pre-merge gate, retires the roadmap item into docs, and squash-merges a pull request. Use when the operator runs /jackin-dev:merge-pr.
+name: jackin-merge-pr
+description: Runs the jackin❯ pre-merge gate, retires the roadmap item into docs, and squash-merges a pull request. Use when the operator runs /jackin-dev:jackin-merge-pr.
 argument-hint: "[PR] [--no-poll] [--admin <check>]"
 disable-model-invocation: true
 ---
 
-# merge-pr
+# jackin-merge-pr
 
-Sequence the jackin' pre-merge gates **fail-closed**, retire the roadmap item into docs, then squash-merge. Reuses the `.github/` agent rules (auto-loaded) and `PULL_REQUESTS.md` — sequences them, never restates them.
+Sequence the jackin❯ pre-merge gates **fail-closed**, retire the roadmap item into docs, then squash-merge. Reuses the `.github/` agent rules (auto-loaded) and `PULL_REQUESTS.md` — sequences them, never restates them.
 
 ## When to use
 
-- Operator runs `/jackin-dev:merge-pr [<PR>]` to merge a jackin' PR (defaults to the current branch's PR).
+- Operator runs `/jackin-dev:jackin-merge-pr [<PR>]` to merge a jackin❯ PR (defaults to the current branch's PR).
 
 ## When NOT to use
 
-- Opening or iterating a PR → `/jackin-dev:create-pr` / `/jackin-dev:propose`.
+- Opening or iterating a PR → `/jackin-dev:jackin-create-pr` / `/jackin-dev:jackin-propose`.
 
 ## Arguments
 
