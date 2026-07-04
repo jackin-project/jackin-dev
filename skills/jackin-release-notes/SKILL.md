@@ -1,10 +1,11 @@
 ---
-name: release-notes
+name: jackin-release-notes
 description: Use when generating or updating the changelog, preparing release notes, or populating the Unreleased section of CHANGELOG.md for the jackin project
 argument-hint: "[context]"
+disable-model-invocation: true
 ---
 
-# Release Notes
+# jackin-release-notes
 
 Generates or updates the `[Unreleased]` section of `CHANGELOG.md` from merged PRs since the last release tag.
 
