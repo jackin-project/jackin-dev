@@ -2,11 +2,11 @@
 
 A plugin providing development workflow skills for the [jackin](https://github.com/jackin-project/jackin) project.
 
-All skills are **manual-only in Claude Code** — each `SKILL.md` sets `disable-model-invocation: true`. That flag is a Claude Code extension; OpenCode and Codex ignore it and may auto-invoke from the `description`. Invocation syntax is per-agent (see the README's [Invocation](README.md#invocation) table).
+All skills are **manual-only** — each sets `disable-model-invocation: true`. That flag is a Claude Code extension; OpenCode and Codex ignore it and may auto-invoke from the `description`, so every description is a bare one-line identity (trigger phrasing stripped) to avoid unwanted auto-fires. Invocation syntax is per-agent (see the README's [Invocation](README.md#invocation) table).
 
 ## Skills
 
-Eight manual-only skills live under `skills/`: `jackin-propose`, `jackin-brainstorm`, `jackin-research`, `jackin-create-pr`, `jackin-merge-pr` (feature workflow) and `jackin-release-check`, `jackin-release-notes`, `jackin-release`.
+Eleven skills live under `skills/`: `jackin-propose`, `jackin-brainstorm`, `jackin-research`, `jackin-create-pr`, `jackin-refresh-pr`, `jackin-checkout-pr`, `jackin-goal-prompt`, `jackin-merge-pr` (feature workflow) and `jackin-release-check`, `jackin-release-notes`, `jackin-release`. All manual-only.
 
 - **What each does, the workflow model, and the design** — see [README.md](README.md).
 - **The full process for one skill** — see its `skills/<name>/SKILL.md`.

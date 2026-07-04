@@ -1,6 +1,6 @@
 ---
 name: jackin-brainstorm
-description: Turns a jackin❯ roadmap item's intent into concrete design decisions through freeform discussion, written into its Design section. Use when the operator wants to shape an open roadmap item's design before implementation.
+description: Turns a jackin❯ roadmap item's intent into concrete design decisions through freeform discussion, written into its ## Design.
 argument-hint: "<slug> [--research] [--resume]"
 disable-model-invocation: true
 ---

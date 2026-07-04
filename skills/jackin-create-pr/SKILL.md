@@ -1,6 +1,6 @@
 ---
 name: jackin-create-pr
-description: Opens a pull request for a small jackin❯ change with the correct body shape and auto-selected verify-locally blocks. Use when shipping a small fix (typo, dependency bump, one-line bugfix, doc tweak) that needs no roadmap item.
+description: Opens a pull request for a small jackin❯ change with the correct body shape and auto-selected verify-locally blocks.
 argument-hint: "[--branch <name>|--auto-branch] [--title <msg>]"
 disable-model-invocation: true
 ---

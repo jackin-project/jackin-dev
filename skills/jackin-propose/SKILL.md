@@ -1,6 +1,6 @@
 ---
 name: jackin-propose
-description: Opens a new jackin❯ feature or idea as a roadmap item draft plus an early pull request, without writing any code. Use when starting a feature or idea that merits a tracked roadmap item.
+description: Opens a jackin❯ feature or idea as a roadmap item draft plus an early PR; never writes code.
 argument-hint: "<idea> [--branch <name>|--auto-branch] [--no-pr] [--research]"
 disable-model-invocation: true
 ---

@@ -4,7 +4,7 @@ Development workflow plugin for the [jackin](https://github.com/jackin-project/j
 
 **Skills are the orchestration layer; the jackin❯ repo's rule files stay the source of truth.** Each skill sequences steps that are otherwise scattered across the repo's auto-loaded topic files (`PULL_REQUESTS.md`, `BRANCHING.md`, `COMMITS.md`, `PRERELEASE.md`, …) and names the governing rule instead of copying it — so when a rule changes, the skill keeps pointing at it. The full behavior of each skill lives in its `skills/<name>/SKILL.md`; this README is the map.
 
-All skills are **manual-only in Claude Code** — each sets `disable-model-invocation: true`. That flag is a Claude Code extension; OpenCode and Codex ignore it and auto-invoke from the `description`. Invocation syntax is per-agent — see [Invocation](#invocation).
+All skills are **manual-only** — each sets `disable-model-invocation: true`, and every description is a bare one-line identity (trigger phrasing stripped) so agents that ignore the flag don't auto-fire. Invocation syntax is per-agent — see [Invocation](#invocation).
 
 ## Invocation
 
@@ -37,9 +37,14 @@ RESEARCH
 
 SMALL FIX
   jackin-create-pr → jackin-merge-pr   (branch + inline commit + PR, no roadmap item)
+  jackin-refresh-pr                    (reconcile title + body to the current diff, on demand)
+  jackin-checkout-pr                   (switch the working repo onto a PR's branch)
+
+KICK OFF A GOAL
+  jackin-goal-prompt                   (distill a roadmap item [+ plan files] into a ≤ 4000-char /goal prompt)
 ```
 
-`goal` is the universal spec-runner (external, used not built here): a roadmap item → code; a research brief → dossier. PR mechanics are shared by `jackin-propose` + `jackin-create-pr`; no skill calls another skill.
+`goal` is the universal spec-runner (external, used not built here): a roadmap item → code; a research brief → dossier. PR mechanics are shared by `jackin-propose` + `jackin-create-pr`; `jackin-refresh-pr` reuses the same `pr body` binary to reconcile an open PR's body after it drifts; no skill calls another skill.
 
 ## Feature skills
 
@@ -58,6 +63,15 @@ Produce a standalone **multi-page dossier** under `docs/content/docs/research/<s
 ### `jackin-create-pr`
 Open a PR for a **small fix** (typo, dep bump, one-line bugfix, doc tweak) — no roadmap item. Also the shared PR-mechanics path: branch, inline commit (Conventional Commits, DCO `-s`), body from `.github/PULL_REQUEST_TEMPLATE.md` with verify-locally blocks auto-selected from the changed paths.
 *Flags:* `--branch <name>` / `--auto-branch`, `--title <msg>`. *Not for:* feature work (→ `jackin-propose`).
+
+### `jackin-refresh-pr`
+Reconcile an **open PR's** title and body against the current diff — regenerates the Verify-locally block selection and rewrites prose that has drifted, preserving what is still accurate. Operator-triggered (not after every commit); the on-demand version of the reconciliation `jackin-merge-pr` does at its final gate.
+
+### `jackin-checkout-pr`
+Switch the **current working repo** onto a PR's branch via `gh pr checkout` — accepts a PR number, URL, or branch name; checks the working tree is clean first. Distinct from `jackin-dev pr sync`, which builds the isolated verification bundle the PR template's Checkout block uses.
+
+### `jackin-goal-prompt`
+Distill a roadmap item — plus optional `/improve` plan files — into a single **self-contained** `/goal` prompt capped at **4000 characters**: objective, scope boundaries, the repo's real verification gates, machine-checkable done criteria, and STOP conditions. Structure borrowed from `/improve`'s plan anatomy; the skeleton that carries execution stays, the rest is pointed at (auto-loaded rules) or dropped (code excerpts) to fit the cap.
 
 ### `jackin-merge-pr`
 Run the jackin❯ pre-merge gate **fail-closed**, retire the roadmap item into docs, then squash-merge. Gates: blast-radius confirm (schema / auth / workflow / force-push), poll CI until green, roadmap retirement (retire-into-docs or status move), metadata reconcile, squash with `(#N)` + trailers.
@@ -148,6 +162,9 @@ So the binary backstops what an agent slips on (a forgotten verify block, a dang
 | `jackin-brainstorm` | — | — | discuss; write `## Design` into the `.mdx` |
 | `jackin-research` | `research scaffold`, `research check` | create the dossier folder + `meta.json`; validate `pages` against disk | author the brief; write `index` + chapters |
 | `jackin-create-pr` | `pr body` | change digest + template with verify-locally blocks selected and byte-exact | write Summary / What ships / Behavior changes |
+| `jackin-refresh-pr` | `pr body` | re-derive the verify-locally block set for the current diff | reconcile title + prose against the diff; keep accurate prose, rewrite drifted |
+| `jackin-checkout-pr` | — | — | normalize the identifier; guard the working tree; `gh pr checkout` |
+| `jackin-goal-prompt` | — | — | distill roadmap + plan files into a ≤ 4000-char self-contained `/goal` prompt |
 | `jackin-merge-pr` | `roadmap retire --plan` / `--apply`, `roadmap audit` (+ CI `schema-check`) | worklist of inbound links + page content; remove the `meta.json` entry, delete the `.mdx`, run the audit, fail on a dangling link | move prose to `guides/`/`reference/`; write the `## Completed` bullet; repoint links |
 | `jackin-release-check` | — | — | review CI / test / exception results |
 | `jackin-release-notes` | — | — | classify merged PRs into changelog categories |
