@@ -1,0 +1,27 @@
+{
+  "name": "jackin-dev",
+  "version": "0.4.0",
+  "description": "Development workflow skills for the jackin project: spec-driven feature workflow, pull requests, research, release management, validation, and changelog generation",
+  "keywords": [
+    "release",
+    "changelog",
+    "validation",
+    "cargo-release",
+    "rust",
+    "pull-request",
+    "roadmap",
+    "research",
+    "spec-driven",
+    "workflow"
+  ],
+  "author": {
+    "name": "Alexey Zhokhov"
+  },
+  "homepage": "https://github.com/jackin-project/jackin-dev",
+  "license": "Apache-2.0",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "jackin-dev",
+    "shortDescription": "Development workflows for the jackin project"
+  }
+}

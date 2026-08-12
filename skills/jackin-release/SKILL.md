@@ -1,8 +1,10 @@
 ---
 name: jackin-release
-description: Cuts a jackin❯ release — runs the readiness gates, writes the changelog, recommends a version, then executes cargo release on explicit operator confirmation.
+description: Use only when the user explicitly requests this skill. Cuts a jackin❯ release — runs the readiness gates, writes the changelog, recommends a version, then executes cargo release on explicit operator confirmation.
 argument-hint: "[major|minor|patch|version]"
 disable-model-invocation: true
+license: Apache-2.0
+user-invocable: true
 ---
 
 # jackin-release

@@ -1,8 +1,10 @@
 ---
 name: jackin-refresh-pr
-description: Reconciles an open jackin❯ pull request's title and body against the current diff — regenerates the Verify-locally block selection and rewrites prose that has drifted.
+description: Use only when the user explicitly requests this skill. Reconciles an open jackin❯ pull request's title and body against the current diff — regenerates the Verify-locally block selection and rewrites prose that has drifted.
 argument-hint: "[PR]"
 disable-model-invocation: true
+license: Apache-2.0
+user-invocable: true
 ---
 
 # jackin-refresh-pr

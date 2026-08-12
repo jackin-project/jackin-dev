@@ -1,0 +1,6 @@
+interface:
+  display_name: "Jackin propose"
+  short_description: "Opens a jackin❯ feature or idea as a roadmap item draft plus an early PR; never writes code."
+  default_prompt: "Use $jackin-propose for this jackin repository task."
+policy:
+  allow_implicit_invocation: false

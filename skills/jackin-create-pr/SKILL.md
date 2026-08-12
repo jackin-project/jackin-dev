@@ -1,8 +1,10 @@
 ---
 name: jackin-create-pr
-description: Opens a pull request for a small jackin❯ change with the correct body shape and auto-selected verify-locally blocks.
+description: Use only when the user explicitly requests this skill. Opens a pull request for a small jackin❯ change with the correct body shape and auto-selected verify-locally blocks.
 argument-hint: "[--branch <name>|--auto-branch] [--title <msg>]"
 disable-model-invocation: true
+license: Apache-2.0
+user-invocable: true
 ---
 
 # jackin-create-pr

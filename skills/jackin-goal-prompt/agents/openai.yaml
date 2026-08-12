@@ -1,0 +1,6 @@
+interface:
+  display_name: "Jackin goal prompt"
+  short_description: "Distills a jackin❯ roadmap item — plus optional plan files — into a self-contained /goal prompt capped at 4000 characters."
+  default_prompt: "Use $jackin-goal-prompt for this jackin repository task."
+policy:
+  allow_implicit_invocation: false

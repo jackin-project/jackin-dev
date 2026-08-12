@@ -1,8 +1,10 @@
 ---
 name: jackin-release-notes
-description: Classifies every PR merged since the last tag into Keep a Changelog categories and writes the [Unreleased] section of CHANGELOG.md.
+description: Use only when the user explicitly requests this skill. Classifies every PR merged since the last tag into Keep a Changelog categories and writes the [Unreleased] section of CHANGELOG.md.
 argument-hint: "[context]"
 disable-model-invocation: true
+license: Apache-2.0
+user-invocable: true
 ---
 
 # jackin-release-notes

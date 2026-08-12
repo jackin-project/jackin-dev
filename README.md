@@ -4,7 +4,10 @@ Development workflow plugin for the [jackin](https://github.com/jackin-project/j
 
 **Skills are the orchestration layer; the jackin❯ repo's rule files stay the source of truth.** Each skill sequences steps that are otherwise scattered across the repo's auto-loaded topic files (`PULL_REQUESTS.md`, `BRANCHING.md`, `COMMITS.md`, `PRERELEASE.md`, …) and names the governing rule instead of copying it — so when a rule changes, the skill keeps pointing at it. The full behavior of each skill lives in its `skills/<name>/SKILL.md`; this README is the map.
 
-All skills are **manual-only** — each sets `disable-model-invocation: true`, and every description is a bare one-line identity (trigger phrasing stripped) so agents that ignore the flag don't auto-fire. Invocation syntax is per-agent — see [Invocation](#invocation).
+All skills are **manual-only** and distributed only through native plugins.
+Do not copy them into `~/.agents/skills/` or another shared global skill tree.
+See [INSTALL.md](INSTALL.md) for the verified plugin-first matrix and duplicate
+removal rules.
 
 ## Invocation
 
@@ -13,13 +16,14 @@ The skill **name** (`jackin-<name>`) is the portable identifier across every age
 | Agent | How to run `jackin-<name>` |
 |---|---|
 | Claude Code (plugin install) | `/jackin-dev:jackin-<name>` |
-| Claude Code (`~/.claude/skills/`) | `/jackin-<name>` |
 | Codex | `$jackin-<name>` (or `/skills` to list/pick) |
 | Grok | `/jackin-<name>` |
-| OpenCode | auto-invoked by the agent via the `skill` tool (from the `description`) |
-| Amp · Kimi Code | auto-invoked by the agent (from the `description`) |
+| Kimi Code | `/skill:jackin-<name>` |
+| Antigravity CLI | `/jackin-<name>` |
 
-`disable-model-invocation: true` keeps these manual-only in Claude Code. Codex's equivalent is `allow_implicit_invocation: false` in `agents/openai.yaml`; OpenCode has no per-skill opt-out (govern via `permission.skill` in `opencode.json`).
+`disable-model-invocation: true` keeps these manual-only in Claude Code, Grok,
+and Kimi Code. Codex's equivalent is `allow_implicit_invocation: false` in each
+skill's `agents/openai.yaml`.
 
 ## Workflow
 
@@ -87,59 +91,20 @@ Run the jackin❯ pre-merge gate **fail-closed**, retire the roadmap item into d
 
 ## Installation
 
-`SKILL.md` is a portable standard — one `skills/<name>/` source serves every agent jackin❯ supports; only the install path differs.
+This repository is its own marketplace and plugin source. Quick install:
 
-### Claude Code
+| Client | Native plugin install |
+|---|---|
+| Claude Code | `claude plugin marketplace add jackin-project/jackin-dev`, then `claude plugin install jackin-dev@jackin-dev` |
+| Codex CLI | `codex plugin marketplace add jackin-project/jackin-dev`, then `codex plugin add jackin-dev` |
+| Grok Build | `grok plugin install jackin-project/jackin-dev --trust` |
+| Kimi Code | `/plugins install https://github.com/jackin-project/jackin-dev`, then `/plugins reload` |
+| Antigravity CLI | Clone the repository, then `agy plugin install ./jackin-dev` |
 
-```sh
-claude plugin marketplace add jackin-project/jackin-marketplace
-claude plugin install jackin-dev@jackin-marketplace
-```
-
-Prefer each agent's native CLI where one exists (Claude Code, Codex, Amp, Grok). OpenCode and Kimi Code have no native skill-from-git installer, so they fall back to the [`skills`](https://www.npmjs.com/package/skills) CLI. Pin to a release tag in production.
-
-### Codex
-
-```sh
-codex plugin marketplace add jackin-project/jackin-marketplace
-codex plugin add jackin-dev@jackin-marketplace
-```
-
-Native `/plugins` flow — the same marketplace Claude Code uses. Refresh after a release with `codex plugin marketplace upgrade`.
-
-### Amp
-
-```sh
-amp skill add jackin-project/jackin-dev --global
-```
-
-Native. Writes `~/.config/agents/skills/`.
-
-### OpenCode
-
-```sh
-npx -y skills add "jackin-project/jackin-dev" -s '*' -a opencode --global --yes
-```
-
-OpenCode has no native skill-from-git installer (`opencode plugin` loads npm modules only). The `skills` CLI writes the shared `~/.agents/skills/` tree, which OpenCode auto-loads.
-
-### Grok
-
-```sh
-grok plugin install jackin-project/jackin-dev
-```
-
-Native. Installs as a Grok plugin (which bundles the skills); add `--trust` to skip the confirmation prompt, and pin with the `@ref` suffix (`jackin-project/jackin-dev@v1.0.0`). Verify with `grok inspect`; each skill surfaces as a `/<skill-name>` slash command.
-
-### Kimi Code
-
-```sh
-npx -y skills add "jackin-project/jackin-dev" -s '*' -a kimi-code-cli --global --yes
-```
-
-Kimi Code CLI (the TypeScript agent) has no native skill installer — skills auto-discover from the shared `~/.agents/skills/` tree this writes to.
-
-The [`jackin-the-architect`](https://github.com/jackin-project/jackin-the-architect) role image bakes this in, so every agent it launches has the skills with no per-agent step.
+OpenCode and Amp are intentionally unsupported under the plugin-only profile;
+do not install jackin into their shared skill directories. Full commands,
+release pinning, upgrades, invocation syntax, and duplicate cleanup:
+[INSTALL.md](INSTALL.md).
 
 ## How it works
 

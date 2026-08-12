@@ -1,8 +1,10 @@
 ---
 name: jackin-goal-prompt
-description: Distills a jackin❯ roadmap item — plus optional plan files — into a self-contained /goal prompt capped at 4000 characters.
+description: Use only when the user explicitly requests this skill. Distills a jackin❯ roadmap item — plus optional plan files — into a self-contained /goal prompt capped at 4000 characters.
 argument-hint: "<slug> [--plan <path|glob>]"
 disable-model-invocation: true
+license: Apache-2.0
+user-invocable: true
 ---
 
 # jackin-goal-prompt

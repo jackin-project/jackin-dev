@@ -1,8 +1,10 @@
 ---
 name: jackin-propose
-description: Opens a jackin❯ feature or idea as a roadmap item draft plus an early PR; never writes code.
+description: Use only when the user explicitly requests this skill. Opens a jackin❯ feature or idea as a roadmap item draft plus an early PR; never writes code.
 argument-hint: "<idea> [--branch <name>|--auto-branch] [--no-pr] [--research]"
 disable-model-invocation: true
+license: Apache-2.0
+user-invocable: true
 ---
 
 # jackin-propose

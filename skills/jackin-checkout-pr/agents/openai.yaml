@@ -1,0 +1,6 @@
+interface:
+  display_name: "Jackin checkout pr"
+  short_description: "Switches the current jackin❯ repo onto a pull request's branch via gh pr checkout, guarding the working tree first."
+  default_prompt: "Use $jackin-checkout-pr for this jackin repository task."
+policy:
+  allow_implicit_invocation: false

@@ -2,7 +2,15 @@
 
 A plugin providing development workflow skills for the [jackin](https://github.com/jackin-project/jackin) project.
 
-All skills are **manual-only** — each sets `disable-model-invocation: true`. That flag is a Claude Code extension; OpenCode and Codex ignore it and may auto-invoke from the `description`, so every description is a bare one-line identity (trigger phrasing stripped) to avoid unwanted auto-fires. Invocation syntax is per-agent (see the README's [Invocation](README.md#invocation) table).
+One `skills/<name>/SKILL.md` source serves every supported native plugin.
+Installation, the per-client compatibility matrix, and duplicate-avoidance
+rules live in `INSTALL.md`. Never install jackin skills into shared global skill
+directories; native plugins are the only supported distribution profile.
+
+All skills are **manual-only**. Claude Code, Grok, and Kimi honor
+`disable-model-invocation: true`; Codex uses `agents/openai.yaml` with
+`policy.allow_implicit_invocation: false`. Every description begins with an
+explicit-request guard for clients that ignore those policy fields.
 
 ## Skills
 
@@ -11,7 +19,8 @@ Eleven skills live under `skills/`: `jackin-propose`, `jackin-brainstorm`, `jack
 - **What each does, the workflow model, and the design** — see [README.md](README.md).
 - **The full process for one skill** — see its `skills/<name>/SKILL.md`.
 
-Invoke by the skill name `jackin-<name>`; the exact syntax is per-agent — Claude Code plugin: `/jackin-dev:jackin-<name>`, Codex: `$jackin-<name>`, Grok: `/jackin-<name>`, OpenCode/Amp/Kimi auto-invoke. See the README's Invocation table.
+Invoke by skill name `jackin-<name>` using the native plugin syntax documented
+in `INSTALL.md`.
 
 ## Requirements
 

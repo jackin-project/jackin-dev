@@ -1,0 +1,6 @@
+interface:
+  display_name: "Jackin research"
+  short_description: "Produces a standalone multi-page research dossier on the jackin❯ docs site, drawing on web and codebase evidence."
+  default_prompt: "Use $jackin-research for this jackin repository task."
+policy:
+  allow_implicit_invocation: false

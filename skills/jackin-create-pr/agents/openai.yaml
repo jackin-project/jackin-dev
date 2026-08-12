@@ -1,0 +1,6 @@
+interface:
+  display_name: "Jackin create pr"
+  short_description: "Opens a pull request for a small jackin❯ change with the correct body shape and auto-selected verify-locally blocks."
+  default_prompt: "Use $jackin-create-pr for this jackin repository task."
+policy:
+  allow_implicit_invocation: false

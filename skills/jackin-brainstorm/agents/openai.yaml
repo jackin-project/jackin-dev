@@ -1,0 +1,6 @@
+interface:
+  display_name: "Jackin brainstorm"
+  short_description: "Turns a jackin❯ roadmap item's intent into concrete design decisions through freeform discussion, written into its ## Design."
+  default_prompt: "Use $jackin-brainstorm for this jackin repository task."
+policy:
+  allow_implicit_invocation: false

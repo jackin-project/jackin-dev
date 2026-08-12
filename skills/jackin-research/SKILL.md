@@ -1,8 +1,10 @@
 ---
 name: jackin-research
-description: Produces a standalone multi-page research dossier on the jackin❯ docs site, drawing on web and codebase evidence.
+description: Use only when the user explicitly requests this skill. Produces a standalone multi-page research dossier on the jackin❯ docs site, drawing on web and codebase evidence.
 argument-hint: "<slug> [--brief-only] [--in-roadmap] [--web-only|--codebase-only]"
 disable-model-invocation: true
+license: Apache-2.0
+user-invocable: true
 ---
 
 # jackin-research
