@@ -1,8 +1,10 @@
 ---
 name: jackin-brainstorm
-description: Turns a jackin❯ roadmap item's intent into concrete design decisions through freeform discussion, written into its ## Design.
+description: Use only when the user explicitly requests this skill. Turns a jackin❯ roadmap item's intent into concrete design decisions through freeform discussion, written into its ## Design.
 argument-hint: "<slug> [--research] [--resume]"
 disable-model-invocation: true
+license: Apache-2.0
+user-invocable: true
 ---
 
 # jackin-brainstorm

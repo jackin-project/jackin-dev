@@ -1,0 +1,6 @@
+interface:
+  display_name: "Jackin release"
+  short_description: "Cuts a jackin❯ release — runs the readiness gates, writes the changelog, recommends a version, then executes cargo release on explicit operator confirmation."
+  default_prompt: "Use $jackin-release for this jackin repository task."
+policy:
+  allow_implicit_invocation: false

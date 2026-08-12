@@ -1,8 +1,10 @@
 ---
 name: jackin-release-check
-description: Runs the jackin❯ release-readiness gates.
+description: Use only when the user explicitly requests this skill. Runs the jackin❯ release-readiness gates.
 argument-hint: "[context]"
 disable-model-invocation: true
+license: Apache-2.0
+user-invocable: true
 ---
 
 # jackin-release-check

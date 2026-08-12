@@ -1,8 +1,10 @@
 ---
 name: jackin-checkout-pr
-description: Switches the current jackin❯ repo onto a pull request's branch via gh pr checkout, guarding the working tree first.
+description: Use only when the user explicitly requests this skill. Switches the current jackin❯ repo onto a pull request's branch via gh pr checkout, guarding the working tree first.
 argument-hint: "<PR number | URL | branch>"
 disable-model-invocation: true
+license: Apache-2.0
+user-invocable: true
 ---
 
 # jackin-checkout-pr

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Jackin merge pr"
+  short_description: "Runs the jackin❯ pre-merge gate, retires the roadmap item into docs, and squash-merges a pull request."
+  default_prompt: "Use $jackin-merge-pr for this jackin repository task."
+policy:
+  allow_implicit_invocation: false

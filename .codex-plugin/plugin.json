@@ -1,6 +1,6 @@
 {
   "name": "jackin-dev",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Development workflow skills for the jackin project: spec-driven feature workflow, pull requests, research, release management, validation, and changelog generation",
   "author": {
     "name": "Alexey Zhokhov"
@@ -20,5 +20,24 @@
     "spec-driven",
     "workflow"
   ],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "jackin-dev",
+    "shortDescription": "Development workflows for the jackin project",
+    "longDescription": "Manual-only workflows for jackin roadmap proposals, design decisions, research, pull requests, releases, and changelog generation.",
+    "developerName": "Alexey Zhokhov",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Roadmap",
+      "Research",
+      "Pull Requests",
+      "Release"
+    ],
+    "websiteURL": "https://github.com/jackin-project/jackin-dev",
+    "defaultPrompt": [
+      "Propose this feature for jackin.",
+      "Create a pull request for this jackin change.",
+      "Run the jackin release-readiness checks."
+    ]
+  }
 }
