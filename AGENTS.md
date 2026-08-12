@@ -2,7 +2,8 @@
 
 A plugin providing development workflow skills for the [jackin](https://github.com/jackin-project/jackin) project.
 
-One `skills/<name>/SKILL.md` source serves every supported native plugin.
+One `skills/<name>/SKILL.md` source serves every supported native plugin and
+Amp's native Claude-plugin compatibility bridge.
 Installation, the per-client compatibility matrix, and duplicate-avoidance
 rules live in `INSTALL.md`. Never install jackin skills into shared global skill
 directories; native plugins are the only supported distribution profile.

@@ -20,6 +20,7 @@ The skill **name** (`jackin-<name>`) is the portable identifier across every age
 | Grok | `/jackin-<name>` |
 | Kimi Code | `/skill:jackin-<name>` |
 | Antigravity CLI | `/jackin-<name>` |
+| Amp | Name `jackin-<name>` in the prompt or select it from the skill palette |
 
 `disable-model-invocation: true` keeps these manual-only in Claude Code, Grok,
 and Kimi Code. Codex's equivalent is `allow_implicit_invocation: false` in each
@@ -100,9 +101,10 @@ This repository is its own marketplace and plugin source. Quick install:
 | Grok Build | `grok plugin install jackin-project/jackin-dev --trust` |
 | Kimi Code | `/plugins install https://github.com/jackin-project/jackin-dev`, then `/plugins reload` |
 | Antigravity CLI | Clone the repository, then `agy plugin install ./jackin-dev` |
+| Amp | Reuse the installed Claude Code plugin; Amp ingests its plugin cache natively |
 
-OpenCode and Amp are intentionally unsupported under the plugin-only profile;
-do not install jackin into their shared skill directories. Full commands,
+OpenCode is intentionally unsupported under the plugin-only profile. Do not
+install jackin into shared skill directories for OpenCode or Amp. Full commands,
 release pinning, upgrades, invocation syntax, and duplicate cleanup:
 [INSTALL.md](INSTALL.md).
 
