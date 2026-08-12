@@ -2,7 +2,8 @@
 
 This is the cross-agent installation contract for jackin-dev. One shared
 `skills/` tree is packaged natively for Claude Code, Codex CLI, Grok Build,
-Kimi Code, and Antigravity CLI.
+Kimi Code, and Antigravity CLI; Amp consumes the Claude plugin cache through
+its native compatibility bridge.
 
 ## One profile only
 
@@ -11,9 +12,10 @@ Use native plugins exclusively. Do not copy or symlink jackin skills into
 `~/.kimi-code/skills/`, or `~/.gemini/config/skills/`. Plugin plus directory
 copies produce duplicate skills and may bypass manual-only policy.
 
-OpenCode and Amp do not have a compatible native repository-plugin channel for
-this package. They are intentionally unsupported rather than installed through
-a shared global skills directory.
+OpenCode has no compatible native repository-plugin channel for this package
+and is intentionally unsupported. Amp's TypeScript plugin API cannot package
+`SKILL.md`, but Amp natively ingests Claude plugin-cache skills. Install the
+Claude plugin once and do not create a separate Amp skill copy.
 
 ## Claude Code
 
@@ -67,17 +69,28 @@ agy plugin install ./jackin-dev
 Invoke `/jackin-<name>`. Do not also copy skills into Gemini or Antigravity
 skill directories.
 
+## Amp
+
+When the Claude Code plugin is installed, no Amp install command is needed.
+Amp reads `~/.claude/plugins/cache/` by default and exposes jackin skills in its
+skill palette. Name `jackin-<name>` in the prompt or select it from the palette.
+
+Do not run `amp skill add` for jackin: it creates duplicate copies under
+`~/.config/agents/skills/`. Keep `amp.skills.disableClaudeCodeSkills` false so
+the native compatibility bridge remains enabled.
+
 ## Upgrade and duplicate audit
 
 At each release, update all native plugin channels to the same latest tag and
 verify that these commands return no jackin directory copies:
 
 ```sh
-find ~/.agents/skills ~/.claude/skills ~/.config/opencode/skills \
-  ~/.kimi-code/skills ~/.gemini/config/skills \
+find ~/.agents/skills ~/.claude/skills ~/.config/agents/skills \
+  ~/.config/opencode/skills ~/.kimi-code/skills ~/.gemini/config/skills \
   -maxdepth 1 -name 'jackin-*' -print 2>/dev/null
 ```
 
 Then inspect the native managers (`claude plugin list`, `codex plugin list`,
-`grok plugin list`, Kimi `/plugins`, and `agy plugin list`). Exactly one native
-plugin source should be active per client.
+`grok plugin list`, Kimi `/plugins`, and `agy plugin list`) plus `amp skill
+list`. Exactly one native plugin source should be active per client; Amp rows
+should resolve from the Claude plugin cache, not `~/.config/agents/skills/`.
