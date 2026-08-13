@@ -1,0 +1,15 @@
+[tools]
+python = "3.14"
+"pipx:reuse" = { version = "6.2.0", extras = "charset-normalizer", depends = ["python"] }
+
+[tasks.ci]
+run = "reuse lint"
+
+[tasks.test]
+run = "reuse lint"
+
+[tasks.lint]
+run = "reuse lint"
+
+[tasks.fmt]
+run = "reuse lint"
