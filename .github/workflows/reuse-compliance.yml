@@ -25,8 +25,7 @@ jobs:
         # Post-merge push is rejected by fleet admission (merged_push_occupancy),
         # so push runs the GitHub lane; dispatch defaults to the Velnor lane.
         config: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.lanes == 'both') && '[{"lane":"Velnor","runner":["self-hosted","velnor-target-mvp"]},{"lane":"GitHub","runner":"ubuntu-26.04"}]' || (github.event_name == 'workflow_dispatch' && inputs.lanes == 'velnor') && '[{"lane":"Velnor","runner":["self-hosted","velnor-target-mvp"]}]' || '[{"lane":"GitHub","runner":"ubuntu-26.04"}]') }}
-    # dispatch default lane resolves to [self-hosted, velnor-target-mvp]
-    runs-on: ${{ matrix.config.runner }}
+    runs-on: ${{ matrix.config.runner }}  # dispatch default lane: [self-hosted, velnor-target-mvp]
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
