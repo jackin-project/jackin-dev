@@ -22,8 +22,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.lanes == 'both') && '[{"lane":"Velnor","runner":["self-hosted","velnor-target-mvp"]},{"lane":"GitHub","runner":"ubuntu-26.04"}]' || (github.event_name == 'workflow_dispatch' && inputs.lanes == 'github') && '[{"lane":"GitHub","runner":"ubuntu-26.04"}]' || '[{"lane":"Velnor","runner":["self-hosted","velnor-target-mvp"]}]') }}
-    # default lane resolves to [self-hosted, velnor-target-mvp]
+        # Post-merge push is rejected by fleet admission (merged_push_occupancy),
+        # so push runs the GitHub lane; dispatch defaults to the Velnor lane.
+        config: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.lanes == 'both') && '[{"lane":"Velnor","runner":["self-hosted","velnor-target-mvp"]},{"lane":"GitHub","runner":"ubuntu-26.04"}]' || (github.event_name == 'workflow_dispatch' && inputs.lanes == 'velnor') && '[{"lane":"Velnor","runner":["self-hosted","velnor-target-mvp"]}]' || '[{"lane":"GitHub","runner":"ubuntu-26.04"}]') }}
+    # dispatch default lane resolves to [self-hosted, velnor-target-mvp]
     runs-on: ${{ matrix.config.runner }}
     timeout-minutes: 10
     steps:
