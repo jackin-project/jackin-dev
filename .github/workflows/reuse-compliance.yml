@@ -4,6 +4,13 @@ name: reuse-compliance
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      lanes:
+        description: velnor (default) | github | both
+        type: choice
+        default: velnor
+        options: [velnor, github, both]
 permissions:
   contents: read
 concurrency:
@@ -11,7 +18,13 @@ concurrency:
   cancel-in-progress: true
 jobs:
   reuse:
-    runs-on: ${{ fromJSON('["self-hosted","velnor-target-mvp"]') }}
+    name: REUSE compliance (${{ matrix.config.lane }})
+    strategy:
+      fail-fast: false
+      matrix:
+        config: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.lanes == 'both') && '[{"lane":"Velnor","runner":["self-hosted","velnor-target-mvp"]},{"lane":"GitHub","runner":"ubuntu-26.04"}]' || (github.event_name == 'workflow_dispatch' && inputs.lanes == 'github') && '[{"lane":"GitHub","runner":"ubuntu-26.04"}]' || '[{"lane":"Velnor","runner":["self-hosted","velnor-target-mvp"]}]') }}
+    # default lane resolves to [self-hosted, velnor-target-mvp]
+    runs-on: ${{ matrix.config.runner }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
