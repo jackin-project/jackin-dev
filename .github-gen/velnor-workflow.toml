@@ -1,0 +1,24 @@
+schema = 1
+
+[generator]
+repository = "jackin-project/jackin-dev"
+revision = "b25201c85adc5da8949cce5c0f7229d84929e304"
+
+[workflow]
+runners = "github"
+automatic = "github"
+default_dispatch_runner = "github"
+automatic_lanes = "github"
+github_runner = "ubuntu-24.04"
+velnor_labels = ["self-hosted", "velnor-target-mvp"]
+default_branch = "main"
+
+[[units]]
+id = "reuse"
+kind = "docs"
+pr_commands = ["pipx run --spec reuse==6.2.0 reuse lint"]
+full_commands = ["pipx run --spec reuse==6.2.0 reuse lint"]
+
+[[static_files]]
+file = ".github/actions/report-velnor-ci-outcomes/action.yml"
+source = ".github-gen/sources/actions/report-velnor-ci-outcomes/action.yml"
