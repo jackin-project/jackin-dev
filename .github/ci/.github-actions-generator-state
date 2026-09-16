@@ -11,7 +11,7 @@ generator	46
 .github/workflows/ci-main.yml	620adb11d1fc5427
 .github/workflows/ci-policy.yml	bb3501d5a4e8e5dd
 .github/workflows/ci-pr.yml	f3f913295c9744c8
-.github/workflows/ci-unit-docs.yml	a8c167cd6486b069
+.github/workflows/ci-unit-docs.yml	5e31731cfb89e853
 .github/workflows/maintenance.yml	78ebc95950f75ce3
 .github/workflows/nightly.yml	9b72f4ea9812e54f
 config/fleet/velnor-host.env	d14b419216449423
