@@ -1,0 +1,30 @@
+schema = 1
+
+[generator]
+repository = "jackin-project/jackin-dev"
+revision = "2c591728a70045dbfee49c9bb4ca0a4ee3612e74"
+
+[workflow]
+runners = "github"
+automatic = "github"
+default_dispatch_runner = "github"
+automatic_lanes = "github"
+github_runner = "ubuntu-24.04"
+velnor_labels = ["self-hosted", "velnor-target-mvp"]
+default_branch = "main"
+
+[[units]]
+id = "reuse"
+kind = "docs"
+root = "."
+watch = ["REUSE.toml", "LICENSES/**", "mise.toml", "mise.lock"]
+ci_tasks = ["ci"]
+mise_tools = ["python", "pipx:reuse"]
+
+[[static_files]]
+file = ".github/workflows/ci-unit-docs.yml"
+source = ".github-gen/sources/workflows/ci-unit-docs.yml"
+
+[[static_files]]
+file = ".github/actions/report-velnor-ci-outcomes/action.yml"
+source = ".github-gen/sources/actions/report-velnor-ci-outcomes/action.yml"
