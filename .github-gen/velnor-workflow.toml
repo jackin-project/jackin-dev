@@ -2,7 +2,7 @@ schema = 1
 
 [generator]
 repository = "jackin-project/jackin-dev"
-revision = "b25201c85adc5da8949cce5c0f7229d84929e304"
+revision = "2c591728a70045dbfee49c9bb4ca0a4ee3612e74"
 
 [workflow]
 runners = "github"
@@ -16,8 +16,14 @@ default_branch = "main"
 [[units]]
 id = "reuse"
 kind = "docs"
-pr_commands = ["pipx run --spec reuse==6.2.0 reuse lint"]
-full_commands = ["pipx run --spec reuse==6.2.0 reuse lint"]
+root = "."
+watch = ["REUSE.toml", "LICENSES/**", "mise.toml", "mise.lock"]
+ci_tasks = ["ci"]
+mise_tools = ["python", "pipx:reuse"]
+
+[[static_files]]
+file = ".github/workflows/ci-unit-docs.yml"
+source = ".github-gen/sources/workflows/ci-unit-docs.yml"
 
 [[static_files]]
 file = ".github/actions/report-velnor-ci-outcomes/action.yml"
