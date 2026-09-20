@@ -5,14 +5,23 @@ lockfile = true
 python = "3.14"
 "pipx:reuse" = { version = "6.2.0", extras = "charset-normalizer", depends = ["python"] }
 
-[tasks.ci]
+# Gate task contract: `lint` is the single real gate (one `reuse lint`
+# execution per commit). `ci`, `test`, and `fmt` are pure depends-aliases of
+# `lint` with no command of their own, so every gate name the canonical CI
+# workflow calls (`mise run ci/test/lint/fmt`) resolves to exactly one reuse
+# execution and no task carries a duplicated command.
+[tasks.lint]
+description = "Run the repository lint gate (single reuse execution)"
 run = "reuse lint"
+
+[tasks.ci]
+description = "Human aggregate gate: alias of lint"
+depends = ["lint"]
 
 [tasks.test]
-run = "reuse lint"
-
-[tasks.lint]
-run = "reuse lint"
+description = "Alias of lint: reuse is the single test gate"
+depends = ["lint"]
 
 [tasks.fmt]
-run = "reuse lint"
+description = "Alias of lint: reuse is the single format gate"
+depends = ["lint"]
